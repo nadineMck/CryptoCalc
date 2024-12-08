@@ -1,32 +1,47 @@
 :root {
-    --bg-primary: #0f1729;  /* Deep navy blue */
+    --bg-primary: #0f1729;
+    /* Deep navy blue */
     --bg-secondary: rgba(15, 23, 41, 0.9);
     --text-primary: #e6f1ff;
     --text-secondary: #8892b0;
-    --accent-primary: #00d9ff;  /* Vibrant cyan */
-    --accent-secondary: #5e3eff;  /* Deep purple */
-    --accent-tertiary: #ff6b6b;  /* Soft red for destructive actions */
+    --accent-primary: #00d9ff;
+    /* Vibrant cyan */
+    --accent-secondary: #5e3eff;
+    /* Deep purple */
+    --accent-tertiary: #ff6b6b;
+    /* Soft red for destructive actions */
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-shadow: rgba(0, 0, 0, 0.3);
 }
+
 .operations button {
-    font-size: 1.2em;  /* Make symbols larger */
+    font-size: 1.2em;
+    /* Make symbols larger */
     font-weight: bold;
-    font-family: Arial, sans-serif;  /* For better symbol rendering */
+    font-family: Arial, sans-serif;
+    /* For better symbol rendering */
 }
+
 .operations {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Two columns */
-    gap: 10px; /* Space between buttons */
-    position: absolute; /* Position relative to the parent container */
-    right: 79px; /* Align to the right edge of the container */
-    top: 50%; /* Center vertically */
-    transform: translateY(-50%); /* Adjust for perfect centering */
-    width: 150px; /* Adjust width as needed */
+    grid-template-columns: 1fr 1fr;
+    /* Two columns */
+    gap: 10px;
+    /* Space between buttons */
+    position: absolute;
+    /* Position relative to the parent container */
+    right: 79px;
+    /* Align to the right edge of the container */
+    top: 50%;
+    /* Center vertically */
+    transform: translateY(-50%);
+    /* Adjust for perfect centering */
+    width: 150px;
+    /* Adjust width as needed */
     background: rgba(13, 22, 44, 0.7);
     padding: 10px;
     border-radius: 10px;
-    box-shadow: 
+    box-shadow:
         0 15px 35px rgba(0, 0, 0, 0.3),
         0 5px 15px rgba(0, 0, 0, 0.2);
 }
@@ -39,6 +54,7 @@
 .parameter-toggle {
     display: none;
 }
+
 /* Existing styles... */
 /*
 .parameter-panel {
@@ -126,6 +142,7 @@ textarea#result {
     margin-right: 0;
     min-height: 20px;
 }
+
 /* Calculator-inspired button styles */
 button {
     background-color: rgba(45, 57, 85, 0.6);
@@ -142,7 +159,7 @@ button {
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(10px);
-    box-shadow: 
+    box-shadow:
         0 4px 6px rgba(0, 0, 0, 0.2),
         inset 0 1px 3px rgba(255, 255, 255, 0.1);
 }
@@ -154,12 +171,10 @@ button::before {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-        120deg, 
-        transparent, 
-        rgba(100, 255, 218, 0.2), 
-        transparent
-    );
+    background: linear-gradient(120deg,
+            transparent,
+            rgba(100, 255, 218, 0.2),
+            transparent);
     transition: all 0.6s ease;
 }
 
@@ -169,7 +184,7 @@ button:hover::before {
 
 button:active {
     transform: scale(0.95);
-    box-shadow: 
+    box-shadow:
         0 2px 4px rgba(0, 0, 0, 0.2),
         inset 0 1px 2px rgba(0, 0, 0, 0.2);
     background-color: rgba(45, 57, 85, 0.8);
@@ -219,19 +234,19 @@ button:active {
 #copy-btn:hover {
     background-color: rgba(100, 255, 218, 0.8);
 }
+
 body {
-    overflow-y: scroll; /* Ensures vertical scrolling */
-  }
-  
-  body {
+    overflow-y: scroll;
+    /* Ensures vertical scrolling */
+}
+
+body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    background: linear-gradient(
-        -45deg, 
-        #0f1729, 
-        #1a2b4a, 
-        #0c1326, 
-        #233355
-    );
+    background: linear-gradient(-45deg,
+            #0f1729,
+            #1a2b4a,
+            #0c1326,
+            #233355);
     background-size: 400% 400%;
     color: var(--text-primary);
     display: flex;
@@ -245,9 +260,17 @@ body {
 }
 
 @keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* Advanced star background effect */
@@ -258,7 +281,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
         radial-gradient(#ffffff 1px, transparent 1px),
         radial-gradient(#ffffff 1px, transparent 1px);
     background-size: 50px 50px;
@@ -269,8 +292,13 @@ body::before {
 }
 
 @keyframes twinkle {
-    0% {opacity: 0.1;}
-    100% {opacity: 0.3;}
+    0% {
+        opacity: 0.1;
+    }
+
+    100% {
+        opacity: 0.3;
+    }
 }
 
 body::after {
@@ -281,16 +309,15 @@ body::after {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    background: radial-gradient(
-        circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-        rgba(100, 255, 218, 0.2) 0%, 
-        rgba(126, 87, 194, 0.1) 50%, 
-        transparent 80%
-    );
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(100, 255, 218, 0.2) 0%,
+            rgba(126, 87, 194, 0.1) 50%,
+            transparent 80%);
     z-index: -1;
     opacity: 0.7;
     transition: background 0.1s ease;
 }
+
 body::after {
     content: "";
     position: fixed;
@@ -299,12 +326,10 @@ body::after {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    background: radial-gradient(
-        circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-        rgba(255, 100, 255, 0.3) 0%, 
-        rgba(126, 87, 194, 0.15) 10%, 
-        transparent 25%
-    );
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(255, 100, 255, 0.3) 0%,
+            rgba(126, 87, 194, 0.15) 10%,
+            transparent 25%);
     opacity: 0.8;
     z-index: 1;
     transition: all 0.3s ease;
@@ -316,20 +341,36 @@ body:hover::after {
 }
 
 @keyframes lightPulse {
-    0% { opacity: 0.6; transform: scale(1); }
-    100% { opacity: 0.8; transform: scale(1.1); }
+    0% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
 }
+
 @keyframes nebulaFlow {
-    0% {transform: scale(1) rotate(0deg);}
-    50% {transform: scale(1.2) rotate(180deg);}
-    100% {transform: scale(1) rotate(360deg);}
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    50% {
+        transform: scale(1.2) rotate(180deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(360deg);
+    }
 }
 
 .container {
     background: rgba(13, 22, 44, 0.7);
     border-radius: 20px;
     padding: 40px;
-    box-shadow: 
+    box-shadow:
         0 15px 35px rgba(0, 0, 0, 0.5),
         0 5px 15px rgba(0, 0, 0, 0.4);
     width: 800px;
@@ -348,19 +389,17 @@ body:hover::after {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(
-        0deg, 
-        transparent, 
-        rgba(100, 255, 218, 0.1), 
-        rgba(126, 87, 194, 0.1)
-    );
+    background: linear-gradient(0deg,
+            transparent,
+            rgba(100, 255, 218, 0.1),
+            rgba(126, 87, 194, 0.1));
     transform: rotate(-45deg);
     z-index: -1;
 }
 
 .container:hover {
     transform: rotateX(0) rotateY(0);
-    box-shadow: 
+    box-shadow:
         0 20px 45px rgba(0, 0, 0, 0.6),
         0 10px 25px rgba(0, 0, 0, 0.5);
 }
@@ -368,7 +407,7 @@ body:hover::after {
 h1 {
     font-size: 1.8em;
     color: var(--accent-primary);
-    text-shadow: 
+    text-shadow:
         0 0 10px rgba(100, 255, 218, 0.6),
         0 0 20px rgba(100, 255, 218, 0.4);
     text-align: center;
@@ -385,16 +424,14 @@ h1::after {
     transform: translateX(-50%);
     width: 100px;
     height: 3px;
-    background: linear-gradient(
-        to right, 
-        transparent, 
-        var(--accent-primary), 
-        transparent
-    );
+    background: linear-gradient(to right,
+            transparent,
+            var(--accent-primary),
+            transparent);
 }
 
-input[type="text"], 
-input[type="number"], 
+input[type="text"],
+input[type="number"],
 textarea {
     background-color: rgba(45, 57, 85, 0.6);
     border: 1px solid var(--glass-border);
@@ -405,17 +442,17 @@ textarea {
     width: 50%;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
-    box-shadow: 
+    box-shadow:
         0 4px 6px var(--glass-shadow),
         inset 0 1px 3px rgba(255, 255, 255, 0.1);
 }
 
-input[type="text"]:focus, 
-input[type="number"]:focus, 
+input[type="text"]:focus,
+input[type="number"]:focus,
 textarea:focus {
     outline: none;
     border-color: var(--accent-primary);
-    box-shadow: 
+    box-shadow:
         0 0 15px rgba(100, 255, 218, 0.5),
         inset 0 1px 3px rgba(255, 255, 255, 0.2);
 }

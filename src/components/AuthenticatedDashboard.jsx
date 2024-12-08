@@ -81,6 +81,7 @@ const AuthenticatedDashboard = ({ onLogout, userName }) => {
     const [activeInput, setActiveInput] = React.useState('first');
     const [copyStatus, setCopyStatus] = React.useState(false);
     const [irreduciblePolyFormat, setIrreduciblePolyFormat] = React.useState('polynomial');
+    const [field, setField] = React.useState('GF(2⁸)');
     const [showPolyQuickTerms, setShowPolyQuickTerms] = React.useState(false);
     // Add handler for irreducible polynomial input
     const handleIrreduciblePolyInput = (value) => {
@@ -179,6 +180,7 @@ const AuthenticatedDashboard = ({ onLogout, userName }) => {
             second: '',
             modulo: Math.pow(2, galoisFields.find(f => f.id === fieldId).power)
         });
+        setField(galoisFields.find(f => f.id === fieldId).label)
     };
 
     const handleCopy = async () => {
@@ -251,43 +253,35 @@ const AuthenticatedDashboard = ({ onLogout, userName }) => {
     };
 
     const handleCalculate = () => {
-        // send axios request, return result
+        // send axios request, return result of calculation
         client.post("/api/calculate", {
             polynomial1: first.value,
-            polynomial2: second.value,
+            polynomial2: operation != 'inverse' ? second.value : "",
             operation: operation,
             inputFormat: inputFormat,
             outputFormat: outputFormat,
             irreduciblePoly: irreduciblePoly,
-            irreduciblePolyFormat: irreduciblePolyFormat
+            irreduciblePolyFormat: irreduciblePolyFormat,
+            field: field,
+            timestamp: new Date()
         })
             .then((response) => {
+                setCalculationSteps(response.data.steps);
                 setResult({
                     operation: operation,
                     value: response.data.result,
-                    timestamp: new Date()
+                    timestamp: response.data.timestamp
                 });
             })
             .catch(function (error) {
                 setResult({
                     operation: operation,
-                    value: error.response.data.message,
+                    value: "An internal React Error has occured: " + error.toString(),
                     timestamp: new Date()
                 });
+                setCalculationSteps([{ description: "Error", value: error.toString() }]);
             });
-        const steps = [
-            { description: "Converting inputs to polynomial form", value: "First input: x² + 2x + 1" },
-            { description: "Applying modulo arithmetic", value: "Computing in GF(2⁸)" },
-            { description: "Performing operation", value: `${operation.toUpperCase()} operation applied` },
-            { description: "Final reduction", value: "Reducing by irreducible polynomial" }
-        ];
 
-        setCalculationSteps(steps);
-        // setResult({
-        //     operation: operation,
-        //     value: `x^2 + 3x + 2 (mod ${input.modulo})`,
-        //     timestamp: new Date()
-        // });
     };
 
     return (
@@ -399,8 +393,8 @@ const AuthenticatedDashboard = ({ onLogout, userName }) => {
                                                 key={field.id}
                                                 onClick={() => handleFieldChange(field.id)}
                                                 className={`flex items-center justify-center px-4 py-3 rounded-lg transition-all ${selectedField === field.id
-                                                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                                        : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
+                                                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                                                    : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
                                                     }`}
                                             >
                                                 <span className="text-sm font-medium">{field.label}</span>
@@ -437,8 +431,8 @@ const AuthenticatedDashboard = ({ onLogout, userName }) => {
                                                     key={index}
                                                     onClick={() => setIrreduciblePoly(poly)}
                                                     className={`px-3 py-2 rounded-lg transition-all text-sm ${irreduciblePoly === poly
-                                                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                                            : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
+                                                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                                                        : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
                                                         }`}
                                                 >
                                                     {poly}
@@ -459,8 +453,8 @@ const AuthenticatedDashboard = ({ onLogout, userName }) => {
                                                         key={format.id}
                                                         onClick={() => setIrreduciblePolyFormat(format.id)}
                                                         className={`px-3 py-2 rounded-lg transition-all ${irreduciblePolyFormat === format.id
-                                                                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                                                : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
+                                                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                                                            : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
                                                             }`}
                                                     >
                                                         {format.label}
@@ -575,8 +569,8 @@ const AuthenticatedDashboard = ({ onLogout, userName }) => {
                                                         key={format.id}
                                                         onClick={() => setInputFormat(format.id)}
                                                         className={`px-3 py-2 rounded-lg transition-all ${inputFormat === format.id
-                                                                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                                                : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
+                                                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                                                            : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
                                                             }`}
                                                     >
                                                         {format.label}
@@ -595,8 +589,8 @@ const AuthenticatedDashboard = ({ onLogout, userName }) => {
                                                         key={format.id}
                                                         onClick={() => setOutputFormat(format.id)}
                                                         className={`px-3 py-2 rounded-lg transition-all ${outputFormat === format.id
-                                                                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                                                : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
+                                                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                                                            : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
                                                             }`}
                                                     >
                                                         {format.label}
@@ -639,8 +633,8 @@ const AuthenticatedDashboard = ({ onLogout, userName }) => {
                                                     key={op.id}
                                                     onClick={() => setOperation(op.id)}
                                                     className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all ${operation === op.id
-                                                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                                            : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
+                                                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                                                        : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
                                                         }`}
                                                 >
                                                     <Icon size={18} />
@@ -758,8 +752,8 @@ const AuthenticatedDashboard = ({ onLogout, userName }) => {
                                         <button
                                             onClick={handleCopy}
                                             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-300 ${copyStatus
-                                                    ? 'bg-green-500/20 text-green-400'
-                                                    : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-800'
+                                                ? 'bg-green-500/20 text-green-400'
+                                                : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-800'
                                                 }`}
                                         >
                                             {copyStatus ? (

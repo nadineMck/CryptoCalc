@@ -1,6 +1,9 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import polynomial
 from polynomial import Polynomial
+import time
+from database import add_user_operation, list_operations_by_uuid
 
 app = Flask(__name__)
 
@@ -81,7 +84,8 @@ def doOperation(poly1, poly2, op):
         return ~poly1
     else:
         raise ValueError("Unknown operation")
-    
+
+
 def getResult(outputFormat, p):
     if outputFormat == "binary":
         return p.bin()
@@ -93,6 +97,12 @@ def getResult(outputFormat, p):
         raise ValueError("Unknown output format")
 
 
+def getUUID():
+    # replace with uuid from cookie
+    uuid = "b632bc53-5a0e-4901-8ebd-f82e7f10f2e8"
+    return uuid
+
+
 @app.route("/api/calculate", methods=["POST"])
 def calculate():
     data = request.get_json()
@@ -101,19 +111,114 @@ def calculate():
         inputFormat = data.get("inputFormat", "polynomial")
         outputFormat = data.get("outputFormat", "polynomial")
         modFormat = data.get("irreduciblePolyFormat", "polynomial")
+        steps = []
+        polynomial.steps = []
         mod = parseInputPolynomial(modFormat, data.get("irreduciblePoly", ""))
         if mod.p == []:
             return jsonify({"result": "Specify modulo field from Parameters panel"})
-        polynomial1 = parseInputPolynomial(inputFormat, data.get("polynomial1", ""), mod)
-        polynomial2 = parseInputPolynomial(inputFormat, data.get("polynomial2", ""), mod)
+        steps.append({"description": "Parse modulo polynomial", "value": str(mod)})
+        polynomial1 = parseInputPolynomial(
+            inputFormat, data.get("polynomial1", ""), mod
+        )
+        steps.append(
+            {"description": "Parse polynomial 1 in field", "value": str(polynomial1)}
+        )
+        polynomial2 = parseInputPolynomial(
+            inputFormat, data.get("polynomial2", ""), mod
+        )
+        steps.append(
+            {"description": "Parse polynomial 2 in field", "value": str(polynomial2)}
+        )
 
         result = doOperation(polynomial1, polynomial2, operation)
         result = getResult(outputFormat, result)
 
-        return jsonify({"result": str(result) if result else "0"})
+        uuid = getUUID()
+        field = data.get("field", "GF(2⁸)")
+        timestamp = data.get("timestamp", str(time.time()))
+
+        steps.extend(
+            [
+                {
+                    "description": replace_powers(step[0]),
+                    "value": replace_powers(step[1]),
+                }
+                for step in polynomial.steps
+            ]
+        )
+        val = str(result) if result else "0"
+        add_user_operation(
+            uuid,
+            timestamp,
+            operation,
+            data.get("polynomial1", ""),
+            data.get("polynomial2", ""),
+            val,
+            field,
+            replace_powers(str(mod)),
+            inputFormat,
+            outputFormat,
+        )
+        return jsonify(
+            {
+                "result": str(result) if result else "0",
+                "steps": steps,
+                "timestamp": timestamp,
+            }
+        )
     except ValueError as e:
         return jsonify({"result": "Error: " + e.args[0]})
 
 
+@app.route("/api/history", methods=["GET"])
+def history():
+    uuid = getUUID()
+    history = list_operations_by_uuid(uuid)
+    history = [
+        {
+            "id": i,
+            "timestamp": item[2],
+            "field": item[3],
+            "irreduciblePolynomial": item[4],
+            "operation": item[5],
+            "input1": item[6],
+            "input2": item[7],
+            "result": item[8],
+            "inputFormat": item[9],
+            "outputFormat": item[10],
+        }
+        for i, item in enumerate(history)
+    ]
+    return jsonify(history)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
+    """
+    const historyData = [
+        {
+            id: 1,
+            timestamp: new Date('2024-12-07T10:30:00'),
+            field: 'GF(2⁸)',
+            irreduciblePolynomial: 'x⁸ + x⁴ + x³ + x + 1',
+            operation: 'add',
+            input1: 'x^2 + x + 1',
+            input2: 'x^3 + x',
+            result: 'x^3 + x^2 + x + 1',
+            inputFormat: 'polynomial',
+            outputFormat: 'polynomial'
+        },
+        {
+            id: 2,
+            timestamp: new Date('2024-12-07T11:15:00'),
+            field: 'GF(2⁴)',
+            irreduciblePolynomial: 'x⁴ + x + 1',
+            operation: 'multiply',
+            input1: '1101',
+            input2: '1011',
+            result: '0111',
+            inputFormat: 'binary',
+            outputFormat: 'binary'
+        }
+    ];
+    """

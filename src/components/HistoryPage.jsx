@@ -14,58 +14,50 @@ import {
     Search,
     X
 } from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
-import {format} from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
-const HistoryPage = ({userName, onLogout}) => {
+import axios from "axios";
+const client = axios.create({
+    baseURL: "http://127.0.0.1:5000",
+});
+
+const HistoryPage = ({ userName, onLogout }) => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = React.useState('');
     const [filteredHistory, setFilteredHistory] = React.useState([]);
+    const [historyData, setHistoryData] = React.useState([]);
+
+    React.useEffect(() => {
+        client.get("/api/history")
+            .then((response) => {
+                console.log(response.data);
+                setHistoryData(response.data);
+                setFilteredHistory(historyData);
+            })
+            .catch((error) => {
+                console.error("Error fetching history:", error);
+            });
+    }, []);
 
     // Enhanced sample history data with all calculation parameters
-    const historyData = [
-        {
-            id: 1,
-            timestamp: new Date('2024-12-07T10:30:00'),
-            field: 'GF(2⁸)',
-            irreduciblePolynomial: 'x⁸ + x⁴ + x³ + x + 1',
-            operation: 'add',
-            input1: 'x^2 + x + 1',
-            input2: 'x^3 + x',
-            result: 'x^3 + x^2 + x + 1',
-            inputFormat: 'polynomial',
-            outputFormat: 'polynomial'
-        },
-        {
-            id: 2,
-            timestamp: new Date('2024-12-07T11:15:00'),
-            field: 'GF(2⁴)',
-            irreduciblePolynomial: 'x⁴ + x + 1',
-            operation: 'multiply',
-            input1: '1101',
-            input2: '1011',
-            result: '0111',
-            inputFormat: 'binary',
-            outputFormat: 'binary'
-        }
-    ];
 
     const getOperationIcon = (operation) => {
         switch (operation) {
             case 'add':
-                return <Plus size={16} className="text-blue-400"/>;
+                return <Plus size={16} className="text-blue-400" />;
             case 'subtract':
-                return <Minus size={16} className="text-blue-400"/>;
+                return <Minus size={16} className="text-blue-400" />;
             case 'multiply':
-                return <X size={16} className="text-blue-400"/>;
+                return <X size={16} className="text-blue-400" />;
             case 'divide':
-                return <Divide size={16} className="text-blue-400"/>;
+                return <Divide size={16} className="text-blue-400" />;
             case 'modulo':
-                return <Percent size={16} className="text-blue-400"/>;
+                return <Percent size={16} className="text-blue-400" />;
             case 'inverse':
-                return <RotateCcw size={16} className="text-blue-400"/>;
+                return <RotateCcw size={16} className="text-blue-400" />;
             default:
-                return <Calculator size={16} className="text-blue-400"/>;
+                return <Calculator size={16} className="text-blue-400" />;
         }
     };
 
@@ -94,7 +86,7 @@ const HistoryPage = ({userName, onLogout}) => {
         } else {
             setFilteredHistory(historyData);
         }
-    }, [searchTerm]);
+    }, [searchTerm, historyData]);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900">
@@ -121,10 +113,10 @@ const HistoryPage = ({userName, onLogout}) => {
                                     onClick={() => navigate('/dashboard')}
                                     className="mr-4 text-gray-400 hover:text-white transition-colors"
                                 >
-                                    <ArrowLeft size={24}/>
+                                    <ArrowLeft size={24} />
                                 </button>
                                 <div className="flex items-center">
-                                    <History className="w-6 h-6 text-blue-400 mr-2"/>
+                                    <History className="w-6 h-6 text-blue-400 mr-2" />
                                     <h1 className="text-xl font-semibold text-white">Calculation History</h1>
                                 </div>
                             </div>
@@ -145,13 +137,13 @@ const HistoryPage = ({userName, onLogout}) => {
                                 className="w-full bg-gray-900/50 text-white placeholder-gray-500 rounded-lg py-3 px-4 pl-12 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
                             />
                             <Search
-                                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"/>
+                                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                             {searchTerm && (
                                 <button
                                     onClick={() => setSearchTerm('')}
                                     className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
                                 >
-                                    <FilterX className="w-5 h-5"/>
+                                    <FilterX className="w-5 h-5" />
                                 </button>
                             )}
                         </div>
@@ -168,15 +160,15 @@ const HistoryPage = ({userName, onLogout}) => {
                                     {/* Header with timestamp and field */}
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-2 text-sm text-gray-400">
-                                            <Calendar className="w-4 h-4"/>
+                                            <Calendar className="w-4 h-4" />
                                             <span>{format(item.timestamp, 'MMM d, yyyy')}</span>
-                                            <Clock className="w-4 h-4 ml-2"/>
+                                            <Clock className="w-4 h-4 ml-2" />
                                             <span>{format(item.timestamp, 'HH:mm')}</span>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                      <span className="px-2 py-1 rounded-md bg-blue-500/20 text-blue-400 text-xs font-medium">
-                        {item.field}
-                      </span>
+                                            <span className="px-2 py-1 rounded-md bg-blue-500/20 text-blue-400 text-xs font-medium">
+                                                {item.field}
+                                            </span>
                                         </div>
                                     </div>
 
@@ -216,7 +208,7 @@ const HistoryPage = ({userName, onLogout}) => {
 
                         {filteredHistory.length === 0 && (
                             <div className="text-center py-12">
-                                <History className="w-12 h-12 text-gray-600 mx-auto mb-4"/>
+                                <History className="w-12 h-12 text-gray-600 mx-auto mb-4" />
                                 <h3 className="text-lg font-medium text-gray-300 mb-2">No calculations found</h3>
                                 <p className="text-gray-400">
                                     {searchTerm ? 'Try adjusting your search terms' : 'Your calculation history will appear here'}

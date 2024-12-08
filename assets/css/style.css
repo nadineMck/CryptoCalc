@@ -1,11 +1,15 @@
 :root {
-    --bg-primary: #0f1729;  /* Deep navy blue */
+    --bg-primary: #0f1729;
+    /* Deep navy blue */
     --bg-secondary: rgba(15, 23, 41, 0.9);
     --text-primary: #e6f1ff;
     --text-secondary: #8892b0;
-    --accent-primary: #00d9ff;  /* Vibrant cyan */
-    --accent-secondary: #5e3eff;  /* Deep purple */
-    --accent-tertiary: #ff6b6b;  /* Soft red for destructive actions */
+    --accent-primary: #00d9ff;
+    /* Vibrant cyan */
+    --accent-secondary: #5e3eff;
+    /* Deep purple */
+    --accent-tertiary: #ff6b6b;
+    /* Soft red for destructive actions */
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-shadow: rgba(0, 0, 0, 0.3);
 }
@@ -13,13 +17,11 @@
 /* Body and Background */
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    background: linear-gradient(
-        -45deg, 
-        #0f1729, 
-        #1a2b4a, 
-        #0c1326, 
-        #233355
-    );
+    background: linear-gradient(-45deg,
+            #0f1729,
+            #1a2b4a,
+            #0c1326,
+            #233355);
     background-size: 400% 400%;
     color: var(--text-primary);
     display: flex;
@@ -33,9 +35,17 @@ body {
 }
 
 @keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* Advanced star background effect */
@@ -46,7 +56,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
         radial-gradient(#ffffff 1px, transparent 1px),
         radial-gradient(#ffffff 1px, transparent 1px);
     background-size: 50px 50px;
@@ -57,8 +67,13 @@ body::before {
 }
 
 @keyframes twinkle {
-    0% { opacity: 0.1; }
-    100% { opacity: 0.3; }
+    0% {
+        opacity: 0.1;
+    }
+
+    100% {
+        opacity: 0.3;
+    }
 }
 
 body::after {
@@ -69,12 +84,10 @@ body::after {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    background: radial-gradient(
-        circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-        rgba(100, 255, 218, 0.2) 0%, 
-        rgba(126, 87, 194, 0.1) 50%, 
-        transparent 80%
-    );
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(100, 255, 218, 0.2) 0%,
+            rgba(126, 87, 194, 0.1) 50%,
+            transparent 80%);
     z-index: -1;
     opacity: 0.7;
     transition: background 0.1s ease;
@@ -100,7 +113,7 @@ button {
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(10px);
-    box-shadow: 
+    box-shadow:
         0 4px 6px rgba(0, 0, 0, 0.2),
         inset 0 1px 3px rgba(255, 255, 255, 0.1);
 }
@@ -112,12 +125,10 @@ button::before {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-        120deg, 
-        transparent, 
-        rgba(100, 255, 218, 0.2), 
-        transparent
-    );
+    background: linear-gradient(120deg,
+            transparent,
+            rgba(100, 255, 218, 0.2),
+            transparent);
     transition: all 0.6s ease;
 }
 
@@ -127,15 +138,15 @@ button:hover::before {
 
 button:active {
     transform: scale(0.95);
-    box-shadow: 
+    box-shadow:
         0 2px 4px rgba(0, 0, 0, 0.2),
         inset 0 1px 2px rgba(0, 0, 0, 0.2);
     background-color: rgba(45, 57, 85, 0.8);
 }
 
 /* Input and Textarea */
-input[type="text"], 
-input[type="number"], 
+input[type="text"],
+input[type="number"],
 textarea {
     background-color: rgba(45, 57, 85, 0.6);
     border: 1px solid var(--glass-border);
@@ -146,20 +157,21 @@ textarea {
     width: 50%;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
-    box-shadow: 
+    box-shadow:
         0 4px 6px var(--glass-shadow),
         inset 0 1px 3px rgba(255, 255, 255, 0.1);
 }
 
-input[type="text"]:focus, 
-input[type="number"]:focus, 
+input[type="text"]:focus,
+input[type="number"]:focus,
 textarea:focus {
     outline: none;
     border-color: var(--accent-primary);
-    box-shadow: 
+    box-shadow:
         0 0 15px rgba(100, 255, 218, 0.5),
         inset 0 1px 3px rgba(255, 255, 255, 0.2);
 }
+
 /* General Reset */
 * {
     margin: 0;
@@ -267,6 +279,7 @@ footer {
 /* Responsive Design */
 @media (max-width: 900px) {
     body {
-        overflow-y: scroll; /* Ensures vertical scrolling on smaller screens */
+        overflow-y: scroll;
+        /* Ensures vertical scrolling on smaller screens */
     }
 }

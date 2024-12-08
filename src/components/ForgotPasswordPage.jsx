@@ -1,6 +1,6 @@
 import React from 'react';
-import {useNavigate} from 'react-router-dom';
-import {ArrowLeft, ArrowRight, Mail} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, Mail } from 'lucide-react';
 
 const ForgotPasswordPage = () => {
     const navigate = useNavigate();
@@ -31,7 +31,7 @@ const ForgotPasswordPage = () => {
                         onClick={() => navigate('/login')}
                         className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8"
                     >
-                        <ArrowLeft size={18}/>
+                        <ArrowLeft size={18} />
                         Back to Login
                     </button>
 
@@ -54,14 +54,14 @@ const ForgotPasswordPage = () => {
                                 className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg py-3 flex items-center justify-center gap-2 transition-all duration-200"
                             >
                                 Return to Login
-                                <ArrowRight size={18}/>
+                                <ArrowRight size={18} />
                             </button>
                         </div>
                     ) : (
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                                    <Mail className="text-gray-500" size={18}/>
+                                    <Mail className="text-gray-500" size={18} />
                                 </div>
                                 <input
                                     type="email"
@@ -81,7 +81,7 @@ const ForgotPasswordPage = () => {
                                 {isLoading ? 'Sending...' : (
                                     <>
                                         Reset Password
-                                        <ArrowRight size={18}/>
+                                        <ArrowRight size={18} />
                                     </>
                                 )}
                             </button>

@@ -90,36 +90,53 @@ def _parse_list(c: list) -> list:
 
 
 # this list represents all the mod polynomials for GF(2^2) thru GF(2^8)
-Classic_Galois = [[], [], [True, True, True], [True, False, True, True], [True, False, False, True, True],
-                  [True, False, True, False, False, True], [True, True, False, False, False, False, True],
-                  [True, True, False, False, False, False, False, True],
-                  [True, True, False, True, True, False, False, False, True]]
+Classic_Galois = [
+    [],
+    [],
+    [True, True, True],
+    [True, False, True, True],
+    [True, False, False, True, True],
+    [True, False, True, False, False, True],
+    [True, True, False, False, False, False, True],
+    [True, True, False, False, False, False, False, True],
+    [True, True, False, True, True, False, False, False, True],
+]
+
+steps = []
 
 
 class Polynomial(object):
-    def __init__(self, b: str = None, s: str = None, L: list = None, mod: object = None, expand_to_mod: bool = True,
-                 field: int = None, use_classic_galois: bool = False) -> None:
+    def __init__(
+        self,
+        b: str = None,
+        s: str = None,
+        L: list = None,
+        mod: object = None,
+        expand_to_mod: bool = True,
+        field: int = None,
+        use_classic_galois: bool = False,
+    ) -> None:
         """
         Creates a new mod 2 coefficient polynomial object. The polynomial is pre-initialized with a value if
         exclusively one of b, s, or L are specified; otherwise, it is blank. If working under a field is desired, then
         a polynomial mod can be explicitly defined using mod, or a field degree GF(2^n) can be specified.
         Can also assume working in a field for appropriately sized polynomials and try to guess the field.
-        
-        The internal representation of a polynomial object is a boolean list p with increasing index representing 
+
+        The internal representation of a polynomial object is a boolean list p with increasing index representing
         increasing powers. For example, self.p[25]=True corresponds to x ** 25, whereas self.p[25]=False does not
         represent x ** 25.
-        :param b: a binary string to be interpreted as a polynomial in binary form. increasing bit significance 
+        :param b: a binary string to be interpreted as a polynomial in binary form. increasing bit significance
         represents increasing power.
-        :param s: a string representing a polynomial. many different formats are accepted, check 
+        :param s: a string representing a polynomial. many different formats are accepted, check
         __parse_string(str) for more details
         :param L: a list representing polynomial coefficients. The list needs to be arranged by increasing coefficients
         which can either be binary or integral.
-        :param mod: a polynomial object representing a field to perform operations under. this parameter might be 
+        :param mod: a polynomial object representing a field to perform operations under. this parameter might be
         guessed based on the value of other parameters.
         :param expand_to_mod: if true, the polynomial's internal representation expands to the highest permissible
         power in the field it is contained in (e.g. len(self.p)=8 for GF(2^8)). this affects certain operations as well
         as representations, such as the bin(p) function.
-        :param field: a number from 2 to 8, representing the classic galois field to work under. 
+        :param field: a number from 2 to 8, representing the classic galois field to work under.
         it is mandatory to specify this number if working under a  classical field to prevent side effects of guessing
         :param use_classic_galois: if true, no mod polynomial is specified, and the polynomial is appropriately sized,
         then try to guess the field the polynomial belongs to by fitting it in the smallest possible field.
@@ -155,14 +172,18 @@ class Polynomial(object):
                 self.expand()
 
     @property
-    def highest_power(self) -> int:
+    def highest_power(self, step=False) -> int:
         """
         It is essential to use such a function when expansion in fields is possible.
         :return: highest power of this polynomial
         """
         for i in range(len(self) - 1, -1, -1):
             if self[i]:
+                if step:
+                    steps.append(("Find highest power of " + str(self), str(i)))
                 return i
+        if step:
+            steps.append(("Find highest power of " + str(self), "0"))
         return 0
 
     def trim(self, length: int = None) -> None:
@@ -198,8 +219,10 @@ class Polynomial(object):
         Converts polynomial to binary string without trimming
         :return: string representing polynomial
         """
-        L = ['1' if x else '0' for x in self[::-1]]
-        return "0b" + ''.join(L)
+        L = ["1" if x else "0" for x in self[::-1]]
+        val = "0b" + "".join(L)
+        steps.append(("Convert " + str(self) + " to binary", val))
+        return val
 
     def copy(self):
         """
@@ -208,7 +231,9 @@ class Polynomial(object):
         """
         return Polynomial(L=self.p.copy(), mod=self.mod)
 
-    def __add__(self, other: object, inplace: bool = False, mod: bool = True) -> object:
+    def __add__(
+        self, other: object, inplace: bool = False, mod: bool = True, step=True
+    ) -> object:
         """
         Performs the addition self + other.
         :param other: the other polynomial to add to self
@@ -218,9 +243,16 @@ class Polynomial(object):
         :return: self+other as a new polynomial, unless inplace is true
         """
         # addition is same as XOR
-        return self.__xor__(other, inplace, mod)
+        val = self.__xor__(other, inplace, mod, step=False)
+        if step:
+            steps.append(
+                ("Perform XOR of " + str(self) + " and " + str(other), str(val))
+            )
+        return val
 
-    def __sub__(self, other: object, inplace: bool = False, mod: bool = True) -> object:
+    def __sub__(
+        self, other: object, inplace: bool = False, mod: bool = True, step=True
+    ) -> object:
         """
         Performs the subtraction self - other.
         :param other: the other polynomial to subtract from self
@@ -230,9 +262,16 @@ class Polynomial(object):
         :return: self-other as a new polynomial, unless inplace is true
         """
         # subtraction is same as addition in mod 2 coefficient space
-        return self.__add__(other, inplace, mod)
+        val = self.__add__(other, inplace, mod, step=False)
+        if step:
+            steps.append(
+                ("Perform XOR of " + str(self) + " and " + str(other), str(val))
+            )
+        return val
 
-    def __mul__(self, other: object, inplace: bool = False, mod: bool = True) -> object:
+    def __mul__(
+        self, other: object, inplace: bool = False, mod: bool = True, step=True
+    ) -> object:
         """
         Performs the multiplication self * other.
         :param other: the other polynomial to multiply with self
@@ -264,28 +303,40 @@ class Polynomial(object):
             # mx represents the highest possible power of the field polynomial
             mx = self.mod.highest_power
             fact = Polynomial(s="x**" + str(mx), mod=self.mod)
+            if step:
+                steps.append(
+                    (
+                        "Find factor polynomial for multiplication: x**"
+                        + str(mx)
+                        + " mod irreducible polynomial",
+                        str(fact),
+                    )
+                )
         # start with x, x**2, until x**mx, adding each step along the way
-        steps = [self.copy()]
+        calc_steps = [self.copy()]
         for i in range(1, other.highest_power + 1):
             # to multiply by x, is to left shift by 1
             # disable mod restriction to check for overflow
-            steps.append(steps[i - 1].__lshift__(1, mod=False))
+            calc_steps.append(calc_steps[i - 1].__lshift__(1, mod=False))
             # if overflow in field detected
-            if mod and self.mod is not None and steps[i][mx]:
+            if mod and self.mod is not None and calc_steps[i][mx]:
                 # replace x**mx by its reduced form and add it to the current step
-                del steps[i][mx]
-                steps[i].trim(len(self))
-                steps[i] += fact
+                del calc_steps[i][mx]
+                calc_steps[i].trim(len(self))
+                calc_steps[i] += fact
             # if the current step is a part of the other polynomial, add it to the steps list
             if other[i]:
-                c += steps[i]
+                c += calc_steps[i]
         # handle inplace as appropriate
+        steps.append(("End up with " + str(self) + " * " + str(other), str(c)))
         if not inplace:
             return c
         else:
             self.p = c.p
 
-    def __truediv__(self, other: object, inplace: bool = False, mod: bool = True) -> object:
+    def __truediv__(
+        self, other: object, inplace: bool = False, mod: bool = True, step=True
+    ) -> object:
         """
         Performs the division self / other.
         :param other: the other polynomial to divide self by
@@ -305,6 +356,8 @@ class Polynomial(object):
         # perform long division
         # first, determine how much bigger is the dividend from the divisor
         r = d.highest_power - other.highest_power
+        if step:
+            steps.append(("Find difference in highest powers", str(r)))
         while r >= 0:
             # shift the divisor to match the dividend
             k = other.__lshift__(r, mod=False)
@@ -316,14 +369,20 @@ class Polynomial(object):
             q += Polynomial(L=c)
             # repeat
             r = d.highest_power - other.highest_power
+            if step:
+                steps.append(("Find difference in highest powers", str(r)))
         # d is the mod remainder
         # handle inplace as appropriate
+        if step:
+            steps.append(
+                ("End up with " + str(self) + " / " + str(other), str(Polynomial(L=c)))
+            )
         if not inplace:
             return q
         else:
             self.p = q.p
 
-    def __invert__(self, inplace: bool = False) -> object:
+    def __invert__(self, inplace: bool = False, step=True) -> object:
         """
         Performs the inverse of self mod (self.mod), i.e. ~self, using extended Euclidean algorithm.
         :param inplace: if true (invoked using self.__invert__(inplace=True)), this function does not
@@ -334,20 +393,52 @@ class Polynomial(object):
         if not self.mod:
             return self.copy()
         # perform extended Euclidean
-        A1, A2, A3 = (Polynomial(L=[True], mod=self.mod), Polynomial(mod=self.mod), self.mod.copy(),)
-        B1, B2, B3 = (Polynomial(mod=self.mod), Polynomial(L=[True], mod=self.mod), self.copy(),)
+        A1, A2, A3 = (
+            Polynomial(L=[True], mod=self.mod),
+            Polynomial(mod=self.mod),
+            self.mod.copy(),
+        )
+        B1, B2, B3 = (
+            Polynomial(mod=self.mod),
+            Polynomial(L=[True], mod=self.mod),
+            self.copy(),
+        )
+        if step:
+            steps.append(("Initialize A1", str(A1)))
+            steps.append(("Initialize A2", str(A2)))
+            steps.append(("Initialize A3", str(A3)))
+            steps.append(("Initialize B1", str(B1)))
+            steps.append(("Initialize B2", str(B2)))
+            steps.append(("Initialize B3", str(B3)))
         while B3.highest_power > 0:
             Q = A3 / B3
-            A1, A2, A3, B1, B2, B3 = (B1, B2, B3, A1 - (Q * B1), A2 - (Q * B2), A3 - (Q * B3),)
+            A1, A2, A3, B1, B2, B3 = (
+                B1,
+                B2,
+                B3,
+                A1 - (Q * B1),
+                A2 - (Q * B2),
+                A3 - (Q * B3),
+            )
+        if step:
+            steps.append(("Update A1", str(A1)))
+            steps.append(("Update A2", str(A2)))
+            steps.append(("Update A3", str(A3)))
+            steps.append(("Update B1", str(B1)))
+            steps.append(("Update B2", str(B2)))
+            steps.append(("Update B3", str(B3)))
         # keep until B3 is 0 or 1
         # if 1, then B2 is ~self
+        steps.append(("End up with inverse of " + str(self), str(B2)))
         if B3[0]:
             return B2
         # else, no inv
         else:
             raise ValueError("No inverse for given polynomial modulo defined modulus")
 
-    def __mod__(self, other: object, inplace: bool = False, mod: bool = True) -> object:
+    def __mod__(
+        self, other: object, inplace: bool = False, mod: bool = True, step=True
+    ) -> object:
         """
         Performs the modulus self mod other, i.e. self % other. By default, if self does not have a field
         specified, assume that other is its new field (unless mod is false).
@@ -366,6 +457,16 @@ class Polynomial(object):
             shift = dividend.highest_power - divisor.highest_power
             shifted_divisor = divisor.__lshift__(shift, mod=False)
             dividend = dividend.__add__(shifted_divisor, mod=False)
+        if step:
+            steps.append(
+                (
+                    "End up with Mod of "
+                    + str(self)
+                    + " with respect to "
+                    + str(other),
+                    str(dividend),
+                )
+            )
         # update field with other
         if mod and self.mod is None:
             self.mod = other
@@ -429,7 +530,9 @@ class Polynomial(object):
         # handle returning + mod cases
         return self.__ret__mod(c, inplace, mod)
 
-    def __xor__(self, other: object, inplace: bool = False, mod: bool = True) -> object:
+    def __xor__(
+        self, other: object, inplace: bool = False, mod: bool = True, step=True
+    ) -> object:
         """
         Performs the XOR self ^ other, assuming binary representation of both. If one of them is longer than the other,
         then expand to fit the longer one.
@@ -452,6 +555,13 @@ class Polynomial(object):
                     c.append(self[i])
             else:
                 c.append(self[i] ^ other[i])
+        if step:
+            steps.append(
+                (
+                    "Find XOR of " + str(self) + " and " + str(other),
+                    str(Polynomial(L=c)),
+                )
+            )
         # handle returning + mod cases
         return self.__ret__mod(c, inplace, mod)
 
@@ -477,6 +587,7 @@ class Polynomial(object):
         # append the original polynomial
         c.extend(self.p)
         # handle returning + mod cases
+        steps.append(("Shift " + str(self) + " by " + str(other), str(Polynomial(L=c))))
         return self.__ret__mod(c, inplace, mod)
 
     def __ret__mod(self, c: list, inplace: bool = False, mod: bool = True) -> object:
@@ -503,8 +614,8 @@ class Polynomial(object):
         Convert polynomial to str
         :return: str representing polynomial, e.g. "x ** 5 + x ** 2 + 1"
         """
-        if len(self) == 0:
-            return ""
+        if len(self) == 0 or (self.highest_power == 0 and not self[0]):
+            return "0"
         L = ["1"] if self[0] else []
         if len(self) > 1 and self[1]:
             L.append("x")
@@ -525,8 +636,10 @@ class Polynomial(object):
         Convert polynomial to numeric value
         :return: int representing polynomial
         """
-        L = ['1' if x else '0' for x in self[::-1]]
-        return int("0b" + ''.join(L), 2)
+        L = ["1" if x else "0" for x in self[::-1]]
+        val = int("0b" + "".join(L), 2)
+        steps.append(("Find integer representation of " + str(self), val))
+        return val
 
     def __len__(self) -> int:
         """
@@ -556,7 +669,7 @@ class Polynomial(object):
                 return []
             if i.stop and i.stop >= len(self):
                 self.expand(i.stop)
-            return self.p[i.start:i.stop:i.step]
+            return self.p[i.start : i.stop : i.step]
         else:
             raise ValueError("Can only get at an integer index or a slice")
 
@@ -579,7 +692,7 @@ class Polynomial(object):
             for k in val:
                 if not isinstance(k, bool):
                     raise ValueError("Coefficient can only be a boolean")
-            self.p[i.start:i.stop:i.step] = val
+            self.p[i.start : i.stop : i.step] = val
         else:
             raise ValueError("Can only set at an integer index or a slice")
 

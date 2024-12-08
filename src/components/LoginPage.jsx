@@ -1,8 +1,8 @@
 import React from 'react';
-import {useNavigate} from 'react-router-dom';
-import {AlertCircle, ArrowRight, Eye, EyeOff, Home, Lock, Mail, User} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { AlertCircle, ArrowRight, Eye, EyeOff, Home, Lock, Mail, User } from 'lucide-react';
 
-const LoginPage = ({initialTab = 'login', onLogin}) => {
+const LoginPage = ({ initialTab = 'login', onLogin }) => {
     const [showPassword, setShowPassword] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState(initialTab);
     const navigate = useNavigate();
@@ -19,7 +19,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
     const [isLoading, setIsLoading] = React.useState(false);
 
     const handleInputChange = (e) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -48,7 +48,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
 
                 // Demo credentials for testing
                 if (formData.email === 'test@example.com' && formData.password === 'Password123') {
-                    const userData = {name: 'Test User', email: formData.email};
+                    const userData = { name: 'Test User', email: formData.email };
                     await onLogin(userData); // Wait for login to complete
                     navigate('/dashboard');
                 } else {
@@ -78,7 +78,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
     const handleHomeClick = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        navigate('/', {replace: true});
+        navigate('/', { replace: true });
     };
     return (
 
@@ -89,7 +89,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                 onClick={handleHomeClick}
                 className="fixed top-4 left-4 flex items-center gap-2 bg-gray-800/50 hover:bg-gray-800 text-white rounded-lg py-2 px-4 transition-all duration-300 backdrop-blur-sm border border-gray-700/50 z-50"
             >
-                <Home size={20}/>
+                <Home size={20} />
                 <span>Back to Home</span>
             </button>
             <div className="absolute inset-0 overflow-hidden">
@@ -128,11 +128,10 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                                 setActiveTab('login');
                                 setError('');
                             }}
-                            className={`flex-1 py-2 px-4 rounded-md transition-all duration-300 ${
-                                activeTab === 'login'
+                            className={`flex-1 py-2 px-4 rounded-md transition-all duration-300 ${activeTab === 'login'
                                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                                     : 'text-gray-400 hover:text-white'
-                            }`}
+                                }`}
                         >
                             Login
                         </button>
@@ -141,11 +140,10 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                                 setActiveTab('signup');
                                 setError('');
                             }}
-                            className={`flex-1 py-2 px-4 rounded-md transition-all duration-300 ${
-                                activeTab === 'signup'
+                            className={`flex-1 py-2 px-4 rounded-md transition-all duration-300 ${activeTab === 'signup'
                                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                                     : 'text-gray-400 hover:text-white'
-                            }`}
+                                }`}
                         >
                             Sign Up
                         </button>
@@ -154,7 +152,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                     {error && (
                         <div
                             className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg flex items-center gap-2 text-red-200">
-                            <AlertCircle size={20}/>
+                            <AlertCircle size={20} />
                             <span>{error}</span>
                         </div>
                     )}
@@ -163,7 +161,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                         {activeTab === 'login' ? (
                             <>
                                 <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                                     <input
                                         type="email"
                                         name="email"
@@ -176,7 +174,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                                 </div>
 
                                 <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         name="password"
@@ -191,13 +189,13 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                                         onClick={() => setShowPassword(!showPassword)}
                                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                                     >
-                                        {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                     </button>
                                 </div>
 
                                 <div className="flex justify-between items-center text-sm">
                                     <label className="flex items-center text-gray-400 hover:text-white cursor-pointer">
-                                        <input type="checkbox" className="mr-2 rounded border-gray-600"/>
+                                        <input type="checkbox" className="mr-2 rounded border-gray-600" />
                                         Remember me
                                     </label>
                                     <button
@@ -212,7 +210,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                         ) : (
                             <>
                                 <div className="relative">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                                     <input
                                         type="text"
                                         name="username"
@@ -225,7 +223,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                                 </div>
 
                                 <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                                     <input
                                         type="email"
                                         name="email"
@@ -238,7 +236,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                                 </div>
 
                                 <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         name="password"
@@ -253,7 +251,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                                         onClick={() => setShowPassword(!showPassword)}
                                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                                     >
-                                        {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                     </button>
                                 </div>
                             </>
@@ -269,7 +267,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                             ) : (
                                 <>
                                     {activeTab === 'login' ? 'Login' : 'Create Account'}
-                                    <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20}/>
+                                    <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
                                 </>
                             )}
                         </button>
