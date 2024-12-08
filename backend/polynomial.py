@@ -5,65 +5,71 @@ def _parse_bin(b: str) -> list:
     :return: the converted list
     """
     # check for python-formatted binary strings
-    if len(b) > 1 and b[:2] == "0b":
-        b = b[2:]
-    L = []
-    for char in b[::-1]:
-        # accept any nonzero character as true, cast down from unconstrained space to space mod 2
-        L.append(False if char == "0" else True)
-    return L
+    try:
+        if len(b) > 1 and b[:2] == "0b":
+            b = b[2:]
+        L = []
+        for char in b[::-1]:
+            # accept any nonzero character as true, cast down from unconstrained space to space mod 2
+            L.append(False if char == "0" else True)
+        return L
+    except ValueError:
+        raise ValueError("Invalid format for input: " + b)
 
 
 def _parse_string(s: str) -> list:
-    """
-    Converts a polynomial string to a list representing polynomial coefficients.
-    :param s: polynomial string
-    :return: converted list
-    """
-    c = [x.strip() for x in s.lower().strip().split("+")]
-    n = {}
+    try:
+        """
+        Converts a polynomial string to a list representing polynomial coefficients.
+        :param s: polynomial string
+        :return: converted list
+        """
+        c = [x.strip() for x in s.lower().strip().split("+")]
+        n = {}
 
-    # accept any coefficients +ve or -ve in any order, then do mod 2
-    def __add_term_n(p: int, val: int) -> None:
-        if p not in n:
-            n[p] = val
-        else:
-            n[p] += val
-
-    # convert the unsorted coefficient list to a sorted mod 2 coefficient list
-    def __dict_to_list():
-        max_power = max(n.keys())
-        L = []
-        for i in range(max_power + 1):
-            if i in n:
-                L.append(False if n[i] == 0 else True)
+        # accept any coefficients +ve or -ve in any order, then do mod 2
+        def __add_term_n(p: int, val: int) -> None:
+            if p not in n:
+                n[p] = val
             else:
-                L.append(False)
-        return L
+                n[p] += val
 
-    for term in c:
-        # no x -> x^0
-        if "x" not in term:
-            __add_term_n(0, int(term))
-        # autodetect ** or ^ for power
-        elif "**" in term:
-            coefx, power = [x.strip() for x in term.split("**", 2)]
-            coef, _ = coefx.split("x", 2)
-            coef = coef.strip().replace("*", "")
-            # if no power, then assume x == x^1; if no coef, then assume x^k == 1 * x^k
-            __add_term_n(int(power) if power else 1, 1 if not coef else int(coef))
-        elif "^" in term:
-            coefx, power = [x.strip() for x in term.split("^", 2)]
-            coef, _ = coefx.split("x", 2)
-            coef = coef.strip().replace("*", "")
-            # if no power, then assume x == x^1; if no coef, then assume x^k == 1 * x^k
-            __add_term_n(int(power) if power else 1, 1 if not coef else int(coef))
-        # assume 8x5 -> 8 * x ** 5
-        else:
-            coef, power = [x.strip().replace("*", "") for x in term.split("x", 2)]
-            # if no power, then assume x == x^1; if no coef, then assume x^k == 1 * x^k
-            __add_term_n(int(power) if power else 1, 1 if not coef else int(coef))
-    return __dict_to_list()
+        # convert the unsorted coefficient list to a sorted mod 2 coefficient list
+        def __dict_to_list():
+            max_power = max(n.keys())
+            L = []
+            for i in range(max_power + 1):
+                if i in n:
+                    L.append(False if n[i] == 0 else True)
+                else:
+                    L.append(False)
+            return L
+
+        for term in c:
+            # no x -> x^0
+            if "x" not in term:
+                __add_term_n(0, int(term))
+            # autodetect ** or ^ for power
+            elif "**" in term:
+                coefx, power = [x.strip() for x in term.split("**", 2)]
+                coef, _ = coefx.split("x", 2)
+                coef = coef.strip().replace("*", "")
+                # if no power, then assume x == x^1; if no coef, then assume x^k == 1 * x^k
+                __add_term_n(int(power) if power else 1, 1 if not coef else int(coef))
+            elif "^" in term:
+                coefx, power = [x.strip() for x in term.split("^", 2)]
+                coef, _ = coefx.split("x", 2)
+                coef = coef.strip().replace("*", "")
+                # if no power, then assume x == x^1; if no coef, then assume x^k == 1 * x^k
+                __add_term_n(int(power) if power else 1, 1 if not coef else int(coef))
+            # assume 8x5 -> 8 * x ** 5
+            else:
+                coef, power = [x.strip().replace("*", "") for x in term.split("x", 2)]
+                # if no power, then assume x == x^1; if no coef, then assume x^k == 1 * x^k
+                __add_term_n(int(power) if power else 1, 1 if not coef else int(coef))
+        return __dict_to_list()
+    except ValueError:
+        raise ValueError("Invalid format for input: " + s)
 
 
 def _parse_list(c: list) -> list:
@@ -119,16 +125,16 @@ class Polynomial(object):
         then try to guess the field the polynomial belongs to by fitting it in the smallest possible field.
         """
         self.p = []
-        if b is not None:
+        if b:
             self.p = _parse_bin(b)
-        elif s is not None:
+        elif s:
             self.p = _parse_string(s)
-        elif L is not None:
+        elif L:
             self.p = _parse_list(L)
         self.mod = mod
         k = len(self)
         # predefined mod polynomial
-        if self.mod is not None:
+        if self.mod:
             if not isinstance(self.mod, Polynomial):
                 raise ValueError("Modulo polynomial must be a polynomial")
             # perform mod from the start if the polynomial is too long

@@ -1,47 +1,47 @@
 import React from 'react';
 import {
-  Calculator,
-  Calculator as CalcIcon,
-  Check,
-  ChevronDown,
-  ChevronRight,
-  ChevronUp,
-  Code,
-  Copy,
-  Divide,
-  Hash,
-  History,
-  Info,
-  LogOut,
-  Minus,
-  Percent,
-  Plus,
-  RefreshCw,
-  RotateCcw,
-  Settings,
-  Sigma,
-  Square,
-  Trash2,
-  User,
-  X
+    Calculator,
+    Calculator as CalcIcon,
+    Check,
+    ChevronDown,
+    ChevronRight,
+    ChevronUp,
+    Code,
+    Copy,
+    Divide,
+    Hash,
+    History,
+    Info,
+    LogOut,
+    Minus,
+    Percent,
+    Plus,
+    RefreshCw,
+    RotateCcw,
+    Settings,
+    Sigma,
+    Square,
+    Trash2,
+    User,
+    X
 } from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 import axios from "axios";
 const client = axios.create({
     baseURL: "http://127.0.0.1:5000",
-  });
-  
-const FormatIndicator = ({format}) => {
+});
+
+const FormatIndicator = ({ format }) => {
     const getFormatIcon = () => {
         switch (format) {
             case 'binary':
-                return <Code className="w-4 h-4"/>;
+                return <Code className="w-4 h-4" />;
             case 'hexadecimal':
-                return <Hash className="w-4 h-4"/>;
+                return <Hash className="w-4 h-4" />;
             case 'polynomial':
-                return <CalcIcon className="w-4 h-4"/>;
+                return <CalcIcon className="w-4 h-4" />;
             default:
                 return null;
         }
@@ -69,7 +69,7 @@ const FormatIndicator = ({format}) => {
     );
 };
 
-const AuthenticatedDashboard = ({onLogout, userName}) => {
+const AuthenticatedDashboard = ({ onLogout, userName }) => {
     const navigate = useNavigate();
     const [showSteps, setShowSteps] = React.useState(false);
     const [calculationSteps, setCalculationSteps] = React.useState([]);
@@ -94,9 +94,9 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
             const start = inputField.selectionStart;
             const end = inputField.selectionEnd;
             const currentValue = irreduciblePoly;
-            const newValue = power === 1
+            const newValue = power === 0 ? `${currentValue.slice(0, start)}1${currentValue.slice(end)}` : power === 1
                 ? `${currentValue.slice(0, start)}x${currentValue.slice(end)}`
-                : `${currentValue.slice(0, start)}x^${power}${currentValue.slice(end)}`;
+                : `${currentValue.slice(0, start)}x${replacePowers(power)}${currentValue.slice(end)}`;
 
             setIrreduciblePoly(newValue);
         }
@@ -132,43 +132,43 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
         navigate('/'); // Then navigate
     };
     const galoisFields = [
-        {id: 'gf2', label: 'GF(2)', power: 1},
-        {id: 'gf4', label: 'GF(2²)', power: 2},
-        {id: 'gf8', label: 'GF(2³)', power: 3},
-        {id: 'gf16', label: 'GF(2⁴)', power: 4},
-        {id: 'gf32', label: 'GF(2⁵)', power: 5},
-        {id: 'gf64', label: 'GF(2⁶)', power: 6},
-        {id: 'gf128', label: 'GF(2⁷)', power: 7},
-        {id: 'gf256', label: 'GF(2⁸)', power: 8}
+        { id: 'gf2', label: 'GF(2)', power: 1 },
+        { id: 'gf4', label: 'GF(2²)', power: 2 },
+        { id: 'gf8', label: 'GF(2³)', power: 3 },
+        { id: 'gf16', label: 'GF(2⁴)', power: 4 },
+        { id: 'gf32', label: 'GF(2⁵)', power: 5 },
+        { id: 'gf64', label: 'GF(2⁶)', power: 6 },
+        { id: 'gf128', label: 'GF(2⁷)', power: 7 },
+        { id: 'gf256', label: 'GF(2⁸)', power: 8 }
     ];
 
     const commonPolynomials = {
-        gf2: {default: 'x + 1', options: ['x + 1']},
-        gf4: {default: 'x² + x + 1', options: ['x² + x + 1']},
-        gf8: {default: 'x³ + x + 1', options: ['x³ + x + 1', 'x³ + x² + 1']},
-        gf16: {default: 'x⁴ + x + 1', options: ['x⁴ + x + 1', 'x⁴ + x³ + 1']},
-        gf32: {default: 'x⁵ + x² + 1', options: ['x⁵ + x² + 1', 'x⁵ + x³ + 1']},
-        gf64: {default: 'x⁶ + x + 1', options: ['x⁶ + x + 1', 'x⁶ + x⁵ + 1']},
-        gf128: {default: 'x⁷ + x³ + 1', options: ['x⁷ + x³ + 1', 'x⁷ + x + 1']},
-        gf256: {default: 'x⁸ + x⁴ + x³ + x + 1', options: ['x⁸ + x⁴ + x³ + x + 1', 'x⁸ + x⁵ + x³ + x² + 1']}
+        gf2: { default: 'x + 1', options: ['x + 1'] },
+        gf4: { default: 'x² + x + 1', options: ['x² + x + 1'] },
+        gf8: { default: 'x³ + x + 1', options: ['x³ + x + 1', 'x³ + x² + 1'] },
+        gf16: { default: 'x⁴ + x + 1', options: ['x⁴ + x + 1', 'x⁴ + x³ + 1'] },
+        gf32: { default: 'x⁵ + x² + 1', options: ['x⁵ + x² + 1', 'x⁵ + x³ + 1'] },
+        gf64: { default: 'x⁶ + x + 1', options: ['x⁶ + x + 1', 'x⁶ + x⁵ + 1'] },
+        gf128: { default: 'x⁷ + x³ + 1', options: ['x⁷ + x³ + 1', 'x⁷ + x + 1'] },
+        gf256: { default: 'x⁸ + x⁴ + x³ + x + 1', options: ['x⁸ + x⁴ + x³ + x + 1', 'x⁸ + x⁵ + x³ + x² + 1'] }
     };
 
     const [irreduciblePoly, setIrreduciblePoly] = React.useState(commonPolynomials.gf256.default);
     const [result, setResult] = React.useState(null);
 
     const formats = [
-        {id: 'binary', label: 'Binary'},
-        {id: 'hexadecimal', label: 'Hexadecimal'},
-        {id: 'polynomial', label: 'Polynomial'}
+        { id: 'binary', label: 'Binary' },
+        { id: 'hexadecimal', label: 'Hexadecimal' },
+        { id: 'polynomial', label: 'Polynomial' }
     ];
 
     const operations = [
-        {id: 'add', label: 'Add', icon: Plus},
-        {id: 'subtract', label: 'Subtract', icon: Minus},
-        {id: 'multiply', label: 'Multiply', icon: X},
-        {id: 'divide', label: 'Divide', icon: Divide},
-        {id: 'modulo', label: 'Modulo', icon: Percent},
-        {id: 'inverse', label: 'Inverse', icon: RotateCcw}
+        { id: 'add', label: 'Add', icon: Plus },
+        { id: 'subtract', label: 'Subtract', icon: Minus },
+        { id: 'multiply', label: 'Multiply', icon: X },
+        { id: 'divide', label: 'Divide', icon: Divide },
+        { id: 'modulo', label: 'Modulo', icon: Percent },
+        { id: 'inverse', label: 'Inverse', icon: RotateCcw }
     ];
 
     const handleFieldChange = (fieldId) => {
@@ -188,6 +188,27 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
             setTimeout(() => setCopyStatus(false), 2000);
         }
     };
+    function replacePowers(inputStr) {
+        const powerMap = {
+            "0": "⁰",
+            "1": "¹",
+            "2": "²",
+            "3": "³",
+            "4": "⁴",
+            "5": "⁵",
+            "6": "⁶",
+            "7": "⁷",
+            "8": "⁸",
+            "9": "⁹"
+        };
+
+        inputStr = inputStr + ""
+        for (const [key, value] of Object.entries(powerMap)) {
+            inputStr = inputStr.split(key).join(value);
+        }
+
+        return inputStr;
+    }
 
     const insertTerm = (power) => {
         const inputField = document.getElementById(activeInput);
@@ -195,9 +216,9 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
             const start = inputField.selectionStart;
             const end = inputField.selectionEnd;
             const currentValue = input[activeInput];
-            const newValue = power === 1
+            const newValue = power === 0 ? `${currentValue.slice(0, start)}1${currentValue.slice(end)}` : power === 1
                 ? `${currentValue.slice(0, start)}x${currentValue.slice(end)}`
-                : `${currentValue.slice(0, start)}x^${power}${currentValue.slice(end)}`;
+                : `${currentValue.slice(0, start)}x${replacePowers(power)}${currentValue.slice(end)}`;
 
             setInput(prev => ({
                 ...prev,
@@ -229,34 +250,36 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
         setResult(null);
     };
 
-    const handleCalculate = () => { 
+    const handleCalculate = () => {
         // send axios request, return result
         client.post("/api/calculate", {
-          polynomial1: first.value,
-          polynomial2: second.value,
-          operation: operation,
-          inputformat: inputFormat,
-        //   outputformat: outputFormat
+            polynomial1: first.value,
+            polynomial2: second.value,
+            operation: operation,
+            inputFormat: inputFormat,
+            outputFormat: outputFormat,
+            irreduciblePoly: irreduciblePoly,
+            irreduciblePolyFormat: irreduciblePolyFormat
         })
-        .then((response) => { 
-            setResult({
-                operation: operation,
-                value: response.data.operation1 + response.data.inpformat + response.data.outformat,
-                timestamp: new Date()
+            .then((response) => {
+                setResult({
+                    operation: operation,
+                    value: response.data.result,
+                    timestamp: new Date()
+                });
+            })
+            .catch(function (error) {
+                setResult({
+                    operation: operation,
+                    value: error.response.data.message,
+                    timestamp: new Date()
+                });
             });
-        })
-        .catch(function (error) {  
-            setResult({
-                operation: operation,
-                value: error.response.data.message,
-                timestamp: new Date()
-            });
-         });
         const steps = [
-            {description: "Converting inputs to polynomial form", value: "First input: x² + 2x + 1"},
-            {description: "Applying modulo arithmetic", value: "Computing in GF(2⁸)"},
-            {description: "Performing operation", value: `${operation.toUpperCase()} operation applied`},
-            {description: "Final reduction", value: "Reducing by irreducible polynomial"}
+            { description: "Converting inputs to polynomial form", value: "First input: x² + 2x + 1" },
+            { description: "Applying modulo arithmetic", value: "Computing in GF(2⁸)" },
+            { description: "Performing operation", value: `${operation.toUpperCase()} operation applied` },
+            { description: "Final reduction", value: "Reducing by irreducible polynomial" }
         ];
 
         setCalculationSteps(steps);
@@ -285,10 +308,10 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
             <nav className="fixed w-full z-50 bg-gray-900/80 backdrop-blur-xl border-b border-gray-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
-            <span
-                className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              CryptoCalc
-            </span>
+                        <span
+                            className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                            CryptoCalc
+                        </span>
 
                         {/* User Menu */}
                         <div className="relative">
@@ -296,9 +319,9 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                 onClick={() => setShowUserMenu(!showUserMenu)}
                                 className="flex items-center space-x-3 bg-gray-800/50 rounded-lg px-4 py-2 text-gray-200 hover:bg-gray-800 transition-colors"
                             >
-                                <User size={20}/>
+                                <User size={20} />
                                 <span>{userName}</span>
-                                <ChevronDown size={16}/>
+                                <ChevronDown size={16} />
                             </button>
 
                             {showUserMenu && (
@@ -309,14 +332,14 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                             onClick={() => navigate('/history')}
                                             className="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 w-full"
                                         >
-                                            <History size={16} className="mr-2"/>
+                                            <History size={16} className="mr-2" />
                                             History
                                         </button>
                                         <button
                                             onClick={handleDeleteUser}
                                             className="flex items-center px-4 py-2 text-red-400 hover:text-red-300 hover:bg-red-900/50 w-full border-t border-gray-800"
                                         >
-                                            <Trash2 size={16} className="mr-2"/>
+                                            <Trash2 size={16} className="mr-2" />
                                             Delete Account
                                         </button>
 
@@ -324,7 +347,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                             onClick={() => handleLogoutClick()}
                                             className="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 w-full"
                                         >
-                                            <LogOut size={16} className="mr-2"/>
+                                            <LogOut size={16} className="mr-2" />
                                             Log Out
                                         </button>
                                     </div>
@@ -349,7 +372,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                 onClick={() => setShowParameters(!showParameters)}
                                 className="bg-gray-800/50 hover:bg-gray-800 text-white rounded-lg px-4 py-2 flex items-center gap-2 transition-all duration-300"
                             >
-                                {showParameters ? <Calculator size={20}/> : <Settings size={20}/>}
+                                {showParameters ? <Calculator size={20} /> : <Settings size={20} />}
                                 {showParameters ? 'Calculator' : 'Parameters'}
                             </button>
                             {!showParameters && (
@@ -357,7 +380,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                     onClick={handleClear}
                                     className="bg-gray-800/50 hover:bg-gray-800 text-white rounded-lg px-4 py-2 flex items-center gap-2"
                                 >
-                                    <RefreshCw size={20}/>
+                                    <RefreshCw size={20} />
                                     Clear
                                 </button>
                             )}
@@ -375,11 +398,10 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                             <button
                                                 key={field.id}
                                                 onClick={() => handleFieldChange(field.id)}
-                                                className={`flex items-center justify-center px-4 py-3 rounded-lg transition-all ${
-                                                    selectedField === field.id
+                                                className={`flex items-center justify-center px-4 py-3 rounded-lg transition-all ${selectedField === field.id
                                                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                                                         : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
-                                                }`}
+                                                    }`}
                                             >
                                                 <span className="text-sm font-medium">{field.label}</span>
                                             </button>
@@ -387,14 +409,14 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                     </div>
                                     <div className="mt-3 p-3 bg-gray-900/50 rounded-lg">
                                         <div className="flex items-center gap-2 text-sm">
-                                            <Square className="w-4 h-4 text-blue-400"/>
+                                            <Square className="w-4 h-4 text-blue-400" />
                                             <span className="text-gray-300">Current Field: </span>
                                             <span className="text-white font-medium">
-                        {galoisFields.find(f => f.id === selectedField)?.label}
-                      </span>
+                                                {galoisFields.find(f => f.id === selectedField)?.label}
+                                            </span>
                                             <span className="text-gray-400">
-                        (modulo {Math.pow(2, galoisFields.find(f => f.id === selectedField)?.power)})
-                      </span>
+                                                (modulo {Math.pow(2, galoisFields.find(f => f.id === selectedField)?.power)})
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -414,11 +436,10 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                 <button
                                                     key={index}
                                                     onClick={() => setIrreduciblePoly(poly)}
-                                                    className={`px-3 py-2 rounded-lg transition-all text-sm ${
-                                                        irreduciblePoly === poly
+                                                    className={`px-3 py-2 rounded-lg transition-all text-sm ${irreduciblePoly === poly
                                                             ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                                                             : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {poly}
                                                 </button>
@@ -437,11 +458,10 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                     <button
                                                         key={format.id}
                                                         onClick={() => setIrreduciblePolyFormat(format.id)}
-                                                        className={`px-3 py-2 rounded-lg transition-all ${
-                                                            irreduciblePolyFormat === format.id
+                                                        className={`px-3 py-2 rounded-lg transition-all ${irreduciblePolyFormat === format.id
                                                                 ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                                                                 : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {format.label}
                                                     </button>
@@ -459,8 +479,8 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                         onClick={() => setShowPolyQuickTerms(!showPolyQuickTerms)}
                                                         className="text-sm text-gray-400 hover:text-white flex items-center gap-1"
                                                     >
-                                                        {showPolyQuickTerms ? <ChevronUp size={16}/> :
-                                                            <ChevronDown size={16}/>}
+                                                        {showPolyQuickTerms ? <ChevronUp size={16} /> :
+                                                            <ChevronDown size={16} />}
                                                         Quick Terms
                                                     </button>
                                                 )}
@@ -476,7 +496,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                     className="w-full bg-gray-900/50 text-white placeholder-gray-500 rounded-lg py-3 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50 font-mono"
                                                 />
                                                 <Sigma
-                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"/>
+                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                                             </div>
 
                                             {/* Quick Terms Panel */}
@@ -496,7 +516,8 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                                         onClick={() => insertIrreducibleTerm(i)}
                                                                         className="bg-gray-900/50 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-sm transition-all"
                                                                     >
-                                                                        x{i > 0 ? <sup>{i}</sup> : ''}
+
+                                                                        {i == 0 ? "1" : "x"}{i > 1 ? <sup>{i}</sup> : ''}
                                                                     </button>
                                                                 ))}
                                                             </div>
@@ -526,7 +547,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                             {/* Info Box */}
                                             <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
                                                 <div className="flex gap-2">
-                                                    <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5"/>
+                                                    <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                                                     <div className="text-sm text-gray-300">
                                                         <p className="font-medium text-blue-400 mb-1">Usage Notes:</p>
                                                         <ul className="list-disc list-inside space-y-1 text-gray-300">
@@ -553,11 +574,10 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                     <button
                                                         key={format.id}
                                                         onClick={() => setInputFormat(format.id)}
-                                                        className={`px-3 py-2 rounded-lg transition-all ${
-                                                            inputFormat === format.id
+                                                        className={`px-3 py-2 rounded-lg transition-all ${inputFormat === format.id
                                                                 ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                                                                 : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {format.label}
                                                     </button>
@@ -574,11 +594,10 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                     <button
                                                         key={format.id}
                                                         onClick={() => setOutputFormat(format.id)}
-                                                        className={`px-3 py-2 rounded-lg transition-all ${
-                                                            outputFormat === format.id
+                                                        className={`px-3 py-2 rounded-lg transition-all ${outputFormat === format.id
                                                                 ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                                                                 : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {format.label}
                                                     </button>
@@ -598,11 +617,11 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                     <div className="flex items-center gap-4">
                                         <div className="flex items-center gap-2">
                                             <span className="text-sm text-gray-400">Input:</span>
-                                            <FormatIndicator format={inputFormat}/>
+                                            <FormatIndicator format={inputFormat} />
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className="text-sm text-gray-400">Output:</span>
-                                            <FormatIndicator format={outputFormat}/>
+                                            <FormatIndicator format={outputFormat} />
                                         </div>
                                     </div>
                                 </div>
@@ -619,13 +638,12 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                 <button
                                                     key={op.id}
                                                     onClick={() => setOperation(op.id)}
-                                                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all ${
-                                                        operation === op.id
+                                                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all ${operation === op.id
                                                             ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                                                             : 'bg-gray-900/50 text-gray-400 hover:text-white hover:bg-gray-800'
-                                                    }`}
+                                                        }`}
                                                 >
-                                                    <Icon size={18}/>
+                                                    <Icon size={18} />
                                                     <span>{op.label}</span>
                                                 </button>
                                             );
@@ -644,7 +662,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                 id="first"
                                                 type="text"
                                                 value={input.first}
-                                                onChange={(e) => setInput({...input, first: e.target.value})}
+                                                onChange={(e) => setInput({ ...input, first: e.target.value })}
                                                 onFocus={() => setActiveInput('first')}
                                                 placeholder="Enter first value"
                                                 className="w-full bg-gray-900/50 text-white placeholder-gray-500 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
@@ -660,7 +678,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                     id="second"
                                                     type="text"
                                                     value={input.second}
-                                                    onChange={(e) => setInput({...input, second: e.target.value})}
+                                                    onChange={(e) => setInput({ ...input, second: e.target.value })}
                                                     onFocus={() => setActiveInput('second')}
                                                     placeholder="Enter second value"
                                                     className="w-full bg-gray-900/50 text-white placeholder-gray-500 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
@@ -672,7 +690,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                             onClick={handleCalculate}
                                             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-lg py-3 px-4 transition-all duration-300 flex items-center justify-center gap-2"
                                         >
-                                            <Calculator size={20}/>
+                                            <Calculator size={20} />
                                             Calculate
                                         </button>
                                     </div>
@@ -693,7 +711,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                                 onClick={() => insertTerm(i)}
                                                                 className="bg-gray-900/50 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-sm transition-all"
                                                             >
-                                                                x{i > 0 ? <sup>{i}</sup> : ''}
+                                                                {i == 0 ? "1" : "x"}{i > 1 ? <sup>{i}</sup> : ''}
                                                             </button>
                                                         ))}
                                                     </div>
@@ -731,7 +749,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                 onClick={() => setShowSteps(!showSteps)}
                                                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-800 transition-all"
                                             >
-                                                {showSteps ? <ChevronUp size={16}/> : <ChevronRight size={16}/>}
+                                                {showSteps ? <ChevronUp size={16} /> : <ChevronRight size={16} />}
                                                 <span className="text-sm">Calculation Steps</span>
                                             </button>
                                         )}
@@ -739,20 +757,19 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                     {result && (
                                         <button
                                             onClick={handleCopy}
-                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-300 ${
-                                                copyStatus
+                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-300 ${copyStatus
                                                     ? 'bg-green-500/20 text-green-400'
                                                     : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-800'
-                                            }`}
+                                                }`}
                                         >
                                             {copyStatus ? (
                                                 <>
-                                                    <Check size={16} className="animate-appear"/>
+                                                    <Check size={16} className="animate-appear" />
                                                     <span className="text-sm">Copied!</span>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <Copy size={16}/>
+                                                    <Copy size={16} />
                                                     <span className="text-sm">Copy</span>
                                                 </>
                                             )}
