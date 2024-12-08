@@ -164,15 +164,15 @@ body {
     .hero h1 {
         font-size: 2.5rem;
     }
-    
+
     .hero p {
         font-size: 1.1rem;
     }
-    
+
     .button-group {
         flex-direction: column;
     }
-    
+
     .features {
         grid-template-columns: 1fr;
     }
