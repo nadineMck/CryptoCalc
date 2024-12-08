@@ -5,7 +5,6 @@ import LoginPage from './components/LoginPage';
 import AuthenticatedDashboard from './components/AuthenticatedDashboard';
 import HistoryPage from './components/HistoryPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage.jsx';
-import axios from "axios";
 
 const App = () => {
     const [isLoggedIn, setIsLoggedIn] = React.useState(false);

@@ -27,6 +27,12 @@ import {
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
+
+import axios from "axios";
+const client = axios.create({
+    baseURL: "http://127.0.0.1:5000",
+  });
+  
 const FormatIndicator = ({format}) => {
     const getFormatIcon = () => {
         switch (format) {
@@ -223,7 +229,29 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
         setResult(null);
     };
 
-    const handleCalculate = () => {
+    const handleCalculate = () => { 
+        // send axios request, return result
+        client.post("/api/calculate", {
+          polynomial1: first.value,
+          polynomial2: second.value,
+          operation: operation,
+          inputformat: inputFormat,
+        //   outputformat: outputFormat
+        })
+        .then((response) => { 
+            setResult({
+                operation: operation,
+                value: response.data.operation1 + response.data.inpformat + response.data.outformat,
+                timestamp: new Date()
+            });
+        })
+        .catch(function (error) {  
+            setResult({
+                operation: operation,
+                value: error.response.data.message,
+                timestamp: new Date()
+            });
+         });
         const steps = [
             {description: "Converting inputs to polynomial form", value: "First input: x² + 2x + 1"},
             {description: "Applying modulo arithmetic", value: "Computing in GF(2⁸)"},
@@ -232,11 +260,11 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
         ];
 
         setCalculationSteps(steps);
-        setResult({
-            operation: operation,
-            value: `x^2 + 3x + 2 (mod ${input.modulo})`,
-            timestamp: new Date()
-        });
+        // setResult({
+        //     operation: operation,
+        //     value: `x^2 + 3x + 2 (mod ${input.modulo})`,
+        //     timestamp: new Date()
+        // });
     };
 
     return (
