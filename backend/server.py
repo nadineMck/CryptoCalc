@@ -194,31 +194,3 @@ def history():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    """
-    const historyData = [
-        {
-            id: 1,
-            timestamp: new Date('2024-12-07T10:30:00'),
-            field: 'GF(2⁸)',
-            irreduciblePolynomial: 'x⁸ + x⁴ + x³ + x + 1',
-            operation: 'add',
-            input1: 'x^2 + x + 1',
-            input2: 'x^3 + x',
-            result: 'x^3 + x^2 + x + 1',
-            inputFormat: 'polynomial',
-            outputFormat: 'polynomial'
-        },
-        {
-            id: 2,
-            timestamp: new Date('2024-12-07T11:15:00'),
-            field: 'GF(2⁴)',
-            irreduciblePolynomial: 'x⁴ + x + 1',
-            operation: 'multiply',
-            input1: '1101',
-            input2: '1011',
-            result: '0111',
-            inputFormat: 'binary',
-            outputFormat: 'binary'
-        }
-    ];
-    """
