@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cryptography Polynomial Arithmetic over GF(2^m)</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/calculator.css">
+
+</head>
+<body>
+    <div class="container">
+        <h1>Cryptography Polynomial Arithmetic over GF(2^m)</h1>
+
+        
+        
+        <div class="input-section">
+            <div class="polynomial-input">
+                <label>Polynomial 1:</label>
+                <input type="text" id="poly1">
+                <div id="term-buttons-1" class="term-buttons">
+                    <button data-term="x^0">x^0</button>
+                    <button data-term="x^1">x^1</button>
+                    <button data-term="x^2">x^2</button>
+                    <button data-term="x^3">x^3</button>
+                    <button data-term="x^4">x^4</button>
+                    <button data-term="x^5">x^5</button>
+                    <button data-term="x^6">x^6</button>
+                    <button data-term="x^7">x^7</button>
+                    <button data-term="x^8">x^8</button>
+                </div>
+            </div>
+
+            <div class="polynomial-input">
+                <label>Polynomial 2:</label>
+                <input type="text" id="poly2">
+                <div id="term-buttons-2" class="term-buttons">
+                    <button data-term="x^0">x^0</button>
+                    <button data-term="x^1">x^1</button>
+                    <button data-term="x^2">x^2</button>
+                    <button data-term="x^3">x^3</button>
+                    <button data-term="x^4">x^4</button>
+                    <button data-term="x^5">x^5</button>
+                    <button data-term="x^6">x^6</button>
+                    <button data-term="x^7">x^7</button>
+                    <button data-term="x^8">x^8</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="operations">
+            <button onclick="performOperation('add')">+</button>
+            <button onclick="performOperation('subtract')">-</button>
+            <button onclick="performOperation('multiply')">x</button>
+            <button onclick="performOperation('divide')">÷</button>
+            <button onclick="performOperation('modulo')">mod</button>
+            <button onclick="performOperation('inverse')">inv</button>
+        </div>
+
+        <div class="output-section">
+            <h2>Result</h2>
+            <div class="result-container">
+                <textarea id="result" readonly></textarea>
+                <button id="copy-btn" onclick="copyToClipboard()">
+                    Copy
+                </button>
+            </div>
+        </div>
+    </div>
+    
+
+    <script src="assets/js/calculator.js"></script>
+</body>
+
+</html>
