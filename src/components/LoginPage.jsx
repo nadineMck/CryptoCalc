@@ -4,6 +4,7 @@ import { AlertCircle, ArrowRight, Eye, EyeOff, Home, Lock, Mail, User } from 'lu
 import Cookies from 'js-cookie';
 
 import axios from "axios";
+axios.defaults.withCredentials = true;
 
 const client = axios.create({
     baseURL: "http://127.0.0.1:5000",
