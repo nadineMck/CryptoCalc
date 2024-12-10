@@ -1,12 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowRight, Eye, EyeOff, Home, Lock, Mail, User } from 'lucide-react';
+import Cookies from 'js-cookie';
 
 import axios from "axios";
- 
+
 const client = axios.create({
     baseURL: "http://127.0.0.1:5000",
-  });
+});
 
 const LoginPage = ({ initialTab = 'login', onLogin }) => {
     const [showPassword, setShowPassword] = React.useState(false);
@@ -51,18 +52,16 @@ const LoginPage = ({ initialTab = 'login', onLogin }) => {
         try {
             if (activeTab === 'login') {
                 await new Promise(resolve => setTimeout(resolve, 1000)); // Fake delay
-                try {
-                    client.post("/login", {  'username': formData.email, 'password': formData.password 
+                client.post("/login", {
+                    'username': formData.email, 'password': formData.password
+                }, { withCredentials: true })
+                    .then((response) => {
+                        Cookies.set('auth_token', response.data.message, { expires: 1, path: '/', sameSite: 'Lax' });
                     })
-                        .then((response) => { 
-                            setError(response.data.message);
-                        })
-                        .catch(function (error) {  
-                                setError("Login failesd " + error.message ); 
-                        }); 
-                } catch (error) {
-                    setError('Login failed: ' + error.message);
-                }
+                    .catch(function (error) {
+                        setError("Login failed " + error.message);
+                    });
+                // client.get("/debug-cookie").then((response)=>console.log(response.data.message)).catch(function (error) {})
                 // Demo credentials for testing
                 // if (formData.email === 'test@example.com' && formData.password === 'Password123') {
                 //     const userData = { name: 'Test User', email: formData.email };
@@ -146,8 +145,8 @@ const LoginPage = ({ initialTab = 'login', onLogin }) => {
                                 setError('');
                             }}
                             className={`flex-1 py-2 px-4 rounded-md transition-all duration-300 ${activeTab === 'login'
-                                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                    : 'text-gray-400 hover:text-white'
+                                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                                : 'text-gray-400 hover:text-white'
                                 }`}
                         >
                             Login
@@ -158,8 +157,8 @@ const LoginPage = ({ initialTab = 'login', onLogin }) => {
                                 setError('');
                             }}
                             className={`flex-1 py-2 px-4 rounded-md transition-all duration-300 ${activeTab === 'signup'
-                                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                    : 'text-gray-400 hover:text-white'
+                                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                                : 'text-gray-400 hover:text-white'
                                 }`}
                         >
                             Sign Up
