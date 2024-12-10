@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request,make_response
 from flask_cors import CORS
 import polynomial
 from polynomial import Polynomial
@@ -6,8 +6,65 @@ import time
 from database import add_user_operation, list_operations_by_uuid
 
 app = Flask(__name__)
+from flask_cors import CORS
 
-CORS(app)
+CORS(app, supports_credentials=True)
+# app.config['SESSION_PROTECTION'] = "strong"
+# app.config['SESSION_COOKIE_HTTPONLY'] = True
+# # Set True after development ends
+# app.config['SESSION_COOKIE_SECURE'] = False  
+# app.config['SECRET_KEY'] = 'SUPER SECRET'
+
+from flask import session
+@app.route('/home', methods = ['GET'])
+def home():
+    username = request.cookies.get('username')
+    if username: 
+        return jsonify(
+            {
+                "cookies": True, 
+                "username": username, 
+            }
+        )
+    return jsonify(
+            {
+                "cookies": False, 
+                "username": 'None', 
+            }
+        )
+
+@app.route('/set-cookie', methods=['POST'])
+def set_cookie():
+    data = request.json
+    response = make_response(jsonify({"message": "Cookie set successfully"}))
+    response.set_cookie('my_cookie', value=data.get('cookie_value', 'default_value'), httponly=True, samesite='Lax')
+    return response
+
+@app.route('/get-cookie', methods=['GET'])
+def get_cookie():
+    cookie_value = request.cookies.get('my_cookie')
+    return jsonify({"cookie_value": cookie_value})
+
+# @app.route('/login', methods=['POST'])
+# def login():
+#     data = request.get_json() 
+#     username = data.get('username')
+#     password = data.get('password') 
+#     if username == 'admin@a.b' and password == 'adminadmin':
+#         resp = make_response(jsonify({'message': 'Successful login'}))
+#         resp.set_cookie('username', username)
+#         # username = admin@example.com
+#         # hashed username = sha256(admin@example.com)
+#         # hashed password = sha256(adminadmin)        
+#         return resp
+
+#     return jsonify({'message': 'Wrong username or password'}) 
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    resp = make_response(jsonify({'message': 'Logged out successfully'}))
+    resp.delete_cookie('username')
+    return resp
 
 
 def replace_powers(input_str):
@@ -102,7 +159,7 @@ def getUUID():
     uuid = "b632bc53-5a0e-4901-8ebd-f82e7f10f2e8"
     return uuid
 
-
+ 
 @app.route("/api/calculate", methods=["POST"])
 def calculate():
     data = request.get_json()

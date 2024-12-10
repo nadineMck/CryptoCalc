@@ -2,6 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowRight, Eye, EyeOff, Home, Lock, Mail, User } from 'lucide-react';
 
+import axios from "axios";
+ 
+const client = axios.create({
+    baseURL: "http://127.0.0.1:5000",
+  });
+
 const LoginPage = ({ initialTab = 'login', onLogin }) => {
     const [showPassword, setShowPassword] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState(initialTab);
@@ -45,15 +51,26 @@ const LoginPage = ({ initialTab = 'login', onLogin }) => {
         try {
             if (activeTab === 'login') {
                 await new Promise(resolve => setTimeout(resolve, 1000)); // Fake delay
-
-                // Demo credentials for testing
-                if (formData.email === 'test@example.com' && formData.password === 'Password123') {
-                    const userData = { name: 'Test User', email: formData.email };
-                    await onLogin(userData); // Wait for login to complete
-                    navigate('/dashboard');
-                } else {
-                    setError('Invalid email or password');
+                try {
+                    client.post("/login", {  'username': formData.email, 'password': formData.password 
+                    })
+                        .then((response) => { 
+                            setError(response.data.message);
+                        })
+                        .catch(function (error) {  
+                                setError("Login failesd " + error.message ); 
+                        }); 
+                } catch (error) {
+                    setError('Login failed: ' + error.message);
                 }
+                // Demo credentials for testing
+                // if (formData.email === 'test@example.com' && formData.password === 'Password123') {
+                //     const userData = { name: 'Test User', email: formData.email };
+                //     await onLogin(userData); // Wait for login to complete
+                //     navigate('/dashboard');
+                // } else {
+                //     setError('Invalid email or password');
+                // }
             } else {
                 // Sign up validation
                 if (!validatePassword(formData.password)) {
