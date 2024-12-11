@@ -1,17 +1,19 @@
+import os
+import secrets
 import time
 
-from flask import Flask, jsonify, url_for, request
+from flask import Flask, jsonify, request, send_from_directory, url_for
 from flask_cors import CORS
 from flask_mail import Mail, Message
-import secrets
+
 import polynomial
 from auth import hash_password, is_password_strong
 from database import (update_user_password, add_user, authenticate_user, add_user_operation,
-                      list_operations_by_username_hash, find_user,
-                      get_password_salt, validate_username_hash, get_user_details, remove_user, find_email)
+                      list_operations_by_username_hash, find_user, get_password_salt, validate_username_hash,
+                      get_user_details, remove_user, find_email)
 from polynomial import Polynomial
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../build')
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -38,11 +40,7 @@ def request_reset():
 
         reset_url = url_for('reset_with_token', token=token, _external=True)
 
-        msg = Message(
-            "CryptoCalc - Password Reset Request",
-            sender=app.config['MAIL_USERNAME'],
-            recipients=[email]
-        )
+        msg = Message("CryptoCalc - Password Reset Request", sender=app.config['MAIL_USERNAME'], recipients=[email])
         msg.body = f"Click the link to reset your password: {reset_url}"
         mail.send(msg)
     return jsonify({"message": "Check your email for a password reset link", "reset": True})
@@ -64,8 +62,9 @@ def reset_with_token(token):
         update_user_password(email, hashed_password, salt)
         user = authenticate_user(email, hashed_password)
         del tokens[email]
-        return jsonify({"message": "Password has been reset successfully!", "reset": True, "email": email,
-                        "username": user[0], "username_hash": user[1]})
+        return jsonify(
+            {"message": "Password has been reset successfully!", "reset": True, "email": email, "username": user[0],
+             "username_hash": user[1]})
     return jsonify({"message": "Invalid or expired token!", "reset": False})
 
 
@@ -108,8 +107,8 @@ def login():
         hashed_password, _ = hash_password(password, salt)
         user = authenticate_user(email, hashed_password)
         if user:
-            return jsonify({"message": "Login successful.", "authenticated": True,
-                            "username": user[0], "username_hash": user[1]})
+            return jsonify(
+                {"message": "Login successful.", "authenticated": True, "username": user[0], "username_hash": user[1]})
         else:
             return jsonify({"message": "Invalid email or password.", "authenticated": False})
     else:
@@ -254,6 +253,15 @@ def history():
          "input1": item[6], "input2": item[7], "result": item[8], "inputFormat": item[9], "outputFormat": item[10], }
         for i, item in enumerate(user_history)]
     return jsonify(user_history)
+
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
 
 
 if __name__ == "__main__":
