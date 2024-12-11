@@ -295,3 +295,169 @@ def get_input_format(uuid, operation_id):
 
 def get_output_format(uuid, operation_id):
     return get_attribute(uuid, operation_id, "outputFormat")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Add a new user (signup)
+def add_user(username, email, password):
+    sql = """
+    INSERT INTO User_Auth (username, email, password)
+    VALUES (%s, %s, %s)
+    """
+    conn = None
+    try:
+        conn = connect()
+        if not conn:
+            return False
+        cur = conn.cursor()
+        cur.execute(sql, (username, email, password))
+        conn.commit()
+        return True
+    except psycopg2.Error as e:
+        print(f"Error adding user: {e}")
+        return False
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
+
+
+# Remove a user
+def remove_user(username):
+    sql = "DELETE FROM User_Auth WHERE username = %s"
+    conn = None
+    try:
+        conn = connect()
+        if not conn:
+            return False
+        cur = conn.cursor()
+        cur.execute(sql, (username,))
+        conn.commit()
+        return True
+    except psycopg2.Error as e:
+        print(f"Error removing user: {e}")
+        return False
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
+
+
+# Authenticate user (login)
+def authenticate_user(email, password):
+    sql = "SELECT * FROM User_Auth WHERE email = %s AND password = %s"
+    conn = None
+    try:
+        conn = connect()
+        if not conn:
+            return False
+        cur = conn.cursor()
+        cur.execute(sql, (email, password))
+        user = cur.fetchone()
+        return user is not None
+    except psycopg2.Error as e:
+        print(f"Error authenticating user: {e}")
+        return False
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
+
+
+# Get user details
+def get_user_by_username(username):
+    sql = "SELECT * FROM User_Auth WHERE username = %s"
+    conn = None
+    try:
+        conn = connect()
+        if not conn:
+            return None
+        cur = conn.cursor()
+        cur.execute(sql, (username,))
+        user = cur.fetchone()
+        return user
+    except psycopg2.Error as e:
+        print(f"Error fetching user {username}: {e}")
+        return None
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
+
+
+# Update user details
+def update_user_email(username, new_email):
+    sql = "UPDATE User_Auth SET email = %s WHERE username = %s"
+    conn = None
+    try:
+        conn = connect()
+        if not conn:
+            return False
+        cur = conn.cursor()
+        cur.execute(sql, (new_email, username))
+        conn.commit()
+        return True
+    except psycopg2.Error as e:
+        print(f"Error updating email for {username}: {e}")
+        return False
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
+
+
+def update_user_password(username, new_password):
+    sql = "UPDATE User_Auth SET password = %s WHERE username = %s"
+    conn = None
+    try:
+        conn = connect()
+        if not conn:
+            return False
+        cur = conn.cursor()
+        cur.execute(sql, (new_password, username))
+        conn.commit()
+        return True
+    except psycopg2.Error as e:
+        print(f"Error updating password for {username}: {e}")
+        return False
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
+
+
+# List all users
+def list_users():
+    sql = "SELECT * FROM User_Auth ORDER BY date_created DESC"
+    conn = None
+    try:
+        conn = connect()
+        if not conn:
+            return None
+        cur = conn.cursor()
+        cur.execute(sql)
+        users = cur.fetchall()
+        return users
+    except psycopg2.Error as e:
+        print(f"Error listing users: {e}")
+        return None
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
+            
+
+
+
+

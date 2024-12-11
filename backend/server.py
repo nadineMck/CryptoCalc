@@ -3,13 +3,52 @@ from flask_cors import CORS
 import polynomial
 from polynomial import Polynomial
 import time
-from database import add_user_operation, list_operations_by_uuid
+from database import add_user, authenticate_user, add_user_operation, list_operations_by_uuid
 
 app = Flask(__name__)
 from flask_cors import CORS
 
 CORS(app, supports_credentials=True)
 
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()  
+ 
+    if 'username' not in data or 'email' not in data or 'password' not in data:
+        return jsonify({"message": "Username, email, and password are required"}),  
+
+    username = data['username']
+    email = data['email']
+    password = data['password']
+ 
+    # hashed_password = generate_password_hash(password)
+ 
+    user_added = add_user(username, email, password)
+
+    if user_added:
+        return jsonify({"message": "Signup successful"}) 
+    else:
+        return jsonify({"message": "Username already exists or another error occurred"}) 
+
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()  
+    if 'email' not in data or 'password' not in data:
+        return jsonify({"message": "Email and password are required"}) 
+
+    email = data['email']
+    password = data['password']
+
+    # Authenticate user
+    is_authenticated = authenticate_user(email, password)
+
+    if is_authenticated:
+        return jsonify({"message": "Login successful"}) 
+    else:
+        return jsonify({"message": "Invalid username or password"}) 
 
 def replace_powers(input_str):
     power_map = {
@@ -191,13 +230,7 @@ def history():
         for i, item in enumerate(history)
     ]
     return jsonify(history)
-
-
-@app.route("/login", methods=["POST"])
-def set_cookie():
-    data = request.json
-    response = make_response(jsonify({"message": data.get("username", "")}))
-    return response
-
-if __name__ == "__main__":
-    app.run(debug=True)
+ 
+ 
+        if __name__ == "__main__":
+            app.run(debug=True)

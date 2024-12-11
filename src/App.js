@@ -5,19 +5,32 @@ import LoginPage from './components/LoginPage';
 import AuthenticatedDashboard from './components/AuthenticatedDashboard';
 import HistoryPage from './components/HistoryPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage.jsx';
-
+import Cookies from 'js-cookie';
 const App = () => {
     const [isLoggedIn, setIsLoggedIn] = React.useState(false);
     const [user, setUser] = React.useState(null);
 
     const handleLogin = (userData) => {
+ 
         setUser(userData);
-        setIsLoggedIn(true);
+ 
+        const username = Cookies.get("auth_token"); // Retrieve the "username" cookie
+        if (username) {
+            setIsLoggedIn(true);
+        } else {
+            setIsLoggedIn(false);
+        } 
     };
 
     const handleLogout = () => {
         setUser(null);
         setIsLoggedIn(false);
+        const username = Cookies.get("auth_token"); // Retrieve the "username" cookie
+        if (username) {
+            setIsLoggedIn(true);
+        } else {
+            setIsLoggedIn(false);
+        } 
     };
 
     return (
@@ -47,15 +60,12 @@ const App = () => {
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route
                     path="/dashboard"
-                    element={
-                        isLoggedIn ? (
+                    element={ 
                             <AuthenticatedDashboard
                                 userName={user?.name || 'User'}
                                 onLogout={handleLogout}
                             />
-                        ) : (
-                            <Navigate to="/login" replace />
-                        )
+                       
                     }
                 />
                 <Route

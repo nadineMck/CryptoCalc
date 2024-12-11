@@ -1,4 +1,5 @@
 import React from 'react';
+import  { useState, useEffect  } from "react";
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowRight, Eye, EyeOff, Home, Lock, Mail, User } from 'lucide-react';
 import Cookies from 'js-cookie';
@@ -12,6 +13,7 @@ const client = axios.create({
 
 const LoginPage = ({ initialTab = 'login', onLogin }) => {
     const [showPassword, setShowPassword] = React.useState(false);
+    const [_currentUser, setCurrentUser] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState(initialTab);
     const navigate = useNavigate();
 
@@ -25,6 +27,24 @@ const LoginPage = ({ initialTab = 'login', onLogin }) => {
     // Error states
     const [error, setError] = React.useState('');
     const [isLoading, setIsLoading] = React.useState(false);
+    useEffect(() => {
+        const performNavigate = async () => {
+          try {
+            const username = Cookies.get("auth_token"); // Retrieve the "username" cookie
+            if (username) {
+                setCurrentUser(true);
+                navigate("/dashboard");
+            } else {
+                setCurrentUser(false);
+            } 
+          } catch (error) {
+            setCurrentUser(false);
+            console.error("Error logging in:", error);
+          }
+        };
+    
+        performNavigate(); 
+      }, [navigate]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -51,40 +71,52 @@ const LoginPage = ({ initialTab = 'login', onLogin }) => {
         setIsLoading(true);
 
         try {
-            if (activeTab === 'login') {
-                await new Promise(resolve => setTimeout(resolve, 1000)); // Fake delay
-                client.post("/login", {
-                    'username': formData.email, 'password': formData.password
-                }, { withCredentials: true })
-                    .then((response) => {
-                        Cookies.set('auth_token', response.data.message, { expires: 1, path: '/', sameSite: 'Lax' });
-                    })
-                    .catch(function (error) {
-                        setError("Login failed " + error.message);
-                    });
-                // client.get("/debug-cookie").then((response)=>console.log(response.data.message)).catch(function (error) {})
-                // Demo credentials for testing
-                // if (formData.email === 'test@example.com' && formData.password === 'Password123') {
-                //     const userData = { name: 'Test User', email: formData.email };
-                //     await onLogin(userData); // Wait for login to complete
-                //     navigate('/dashboard');
-                // } else {
-                //     setError('Invalid email or password');
-                // }
+            const username = Cookies.get("auth_token"); // Retrieve the "username" cookie
+            if (username) {
+                navigate('/dashboard'); 
             } else {
-                // Sign up validation
-                if (!validatePassword(formData.password)) {
-                    setError('Password must be at least 8 characters and contain one uppercase letter');
+                if (activeTab === 'login') {
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Fake delay
+                    client.post("/login", {
+                        'email': formData.email, 'password': formData.password
+                    }, { withCredentials: true })
+                        .then((response) => {
+                            if (response.data.message == "Login successful"){
+                             Cookies.set('username', formData.email, { expires: 1, path: '/', sameSite: 'Lax' });
+                             const userData = { name: 'Test User', email: formData.email }; 
+                             navigate('/dashboard');
+                            } else {
+                             setError(response.data.message)
+                            }
+                            })
+                        .catch(function (error) {
+                            setError("Login failed: error");
+                        });   
                 } else {
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    const userData = {
-                        name: formData.username,
-                        email: formData.email
-                    };
-                    await onLogin(userData); // Login after successful signup
-                    navigate('/dashboard');
+                    // Sign up validation
+                    if (!validatePassword(formData.password)) {
+                        setError('Password must be at least 8 characters and contain one uppercase letter');
+                    } else {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        client.post("/signup", {
+                            'username': formData.username, 'email': formData.email, 'password': formData.password
+                        }, { withCredentials: true })
+                            .then((response) => {
+                                if (response.data.message == "Signup successful"){
+                                 Cookies.set('username', formData.email, { expires: 1, path: '/', sameSite: 'Lax' });
+                                 const userData = { name: 'Test User', email: formData.email }; 
+                                 navigate('/dashboard');
+                                } else {
+                                 setError(response.data.message)
+                                }
+                                })
+                            .catch(function (error) {
+                                setError("Signup failed: error");
+                            });    
+                    }
                 }
-            }
+            }  
+          
         } catch (err) {
             setError('Something went wrong. Please try again.');
             console.error('Auth error:', err);
