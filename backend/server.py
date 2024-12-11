@@ -6,12 +6,12 @@ from flask import Flask, jsonify, request, send_from_directory, url_for
 from flask_cors import CORS
 from flask_mail import Mail, Message
 
-import polynomial
-from auth import hash_password, is_password_strong
-from database import (update_user_password, add_user, authenticate_user, add_user_operation,
-                      list_operations_by_username_hash, find_user, get_password_salt, validate_username_hash,
-                      get_user_details, remove_user, find_email)
-from polynomial import Polynomial
+import backend.polynomial as polynomial
+from backend.auth import hash_password, is_password_strong
+from backend.database import (update_user_password, add_user, authenticate_user, add_user_operation,
+                              list_operations_by_username_hash, find_user, get_password_salt, validate_username_hash,
+                              get_user_details, remove_user, find_email)
+from backend.polynomial import Polynomial
 
 app = Flask(__name__, static_folder='../build')
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
