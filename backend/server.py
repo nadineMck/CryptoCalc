@@ -42,6 +42,7 @@ def request_reset():
     msg = Message("CryptoCalc - Password Reset Request", sender=app.config['MAIL_USERNAME'], recipients=[email])
     msg.body = f"Click the link to reset your password: {reset_url}"
     mail.send(msg)
+    return jsonify({"message": "Success", "reset": True})
 
 
 # Password Reset with Token Route
