@@ -276,7 +276,8 @@ def add_user(username, username_hash, email, password, salt):
 
 
 def remove_user(username_hash):
-    sql = "DELETE FROM User_Auth WHERE username_hash = %s"
+    sql_user = "DELETE FROM User_Auth WHERE username_hash = %s"
+    sql_op = "DELETE FROM User_Operations WHERE username_hash = %s"
     conn = None
     cur = None
     try:
@@ -284,7 +285,9 @@ def remove_user(username_hash):
         if not conn:
             return False
         cur = conn.cursor()
-        cur.execute(sql, (username_hash,))
+        cur.execute(sql_user, (username_hash,))
+        cur = conn.cursor()
+        cur.execute(sql_op, (username_hash,))
         conn.commit()
         return True
     except psycopg2.Error as e:
