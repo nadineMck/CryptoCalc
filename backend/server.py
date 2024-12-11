@@ -19,7 +19,7 @@ app.config['MAIL_USERNAME'] = 't3067272@gmail.com'  # Replace with your Gmail
 app.config['MAIL_PASSWORD'] = 'mlkn suou dcoe nand'  # Replace with your App Password
 app.secret_key = "your_secret_key_here"
 mail = Mail(app)
-
+CORS(app, supports_credentials=True)
 # Temporary storage for tokens 
 tokens = {}
 # Password Reset Request Route
@@ -65,7 +65,7 @@ def reset_with_token(token):
         return jsonify({"message": "Password has been reset successfully!" })  
     return jsonify({"message": "Invalid or expired token!" })  
 
-CORS(app, supports_credentials=True)
+ 
 
 
 @app.route('/signup', methods=['POST'])
