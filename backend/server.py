@@ -1,8 +1,9 @@
 import time
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, url_for, request
 from flask_cors import CORS
-
+from flask_mail import Mail, Message
+import secrets
 import polynomial
 from auth import hash_password, is_password_strong
 from database import (add_user, authenticate_user, add_user_operation, list_operations_by_username_hash, find_user,
@@ -10,6 +11,57 @@ from database import (add_user, authenticate_user, add_user_operation, list_oper
 from polynomial import Polynomial
 
 app = Flask(__name__)
+# Flask-Mail Configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 't3067272@gmail.com'  # Replace with your Gmail
+app.config['MAIL_PASSWORD'] = 'mlkn suou dcoe nand'  # Replace with your App Password
+app.secret_key = "your_secret_key_here"
+mail = Mail(app)
+
+# Temporary storage for tokens 
+tokens = {}
+# Password Reset Request Route
+@app.route('/reset', methods=['GET', 'POST'])
+def request_reset():
+    if request.method == 'POST':
+        email = request.form['email']
+
+        # Generate a secure random token
+        token = secrets.token_urlsafe(16)
+        tokens[email] = token
+
+        # Generate the reset URL
+        reset_url = url_for('reset_with_token', token=token, _external=True)
+
+        # Create and send the email
+        msg = Message(
+            "Password Reset Request",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[email]
+        )
+        msg.body = f"Click the link to reset your password: {reset_url}"
+        mail.send(msg) 
+    
+    # Display the password reset form
+    return jsonify({"message": "Worked" })
+
+# Password Reset with Token Route
+@app.route('/reset/<token>', methods=['GET', 'POST'])
+def reset_with_token(token):
+    # Find the email associated with the token
+    email = next((email for email, t in tokens.items() if t == token), None)
+    if not email:
+        return jsonify({"message": "Invalid or expired token!" })  
+    if request.method == 'POST':
+        new_password = request.form['password']
+        # Logic to save the new password (placeholder for now)
+        print(f"Updated password for {email}: {new_password}")
+        
+        del tokens[email]  # Invalidate the token 
+        return jsonify({"message": "Password has been reset successfully!" })  
+    return jsonify({"message": "Invalid or expired token!" })  
 
 CORS(app, supports_credentials=True)
 

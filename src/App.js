@@ -4,6 +4,7 @@ import MainPage from './components/MainPage';
 import LoginPage, {validate_cookie, get_user_data} from './components/LoginPage';
 import AuthenticatedDashboard from './components/AuthenticatedDashboard';
 import HistoryPage from './components/HistoryPage';
+import ResetPage from './components/ResetPage.jsx';
 import ForgotPasswordPage from './components/ForgotPasswordPage.jsx';
 import Cookies from 'js-cookie';
 
@@ -58,6 +59,14 @@ const App = () => {
                             onLogin={handleLogin}
                             isLoggedIn={isLoggedIn}
                             initialTab="login"
+                        />
+                    }
+                />
+                <Route
+                    path="/reset/:token"
+                    element={
+                        <ResetPage 
+                           
                         />
                     }
                 />

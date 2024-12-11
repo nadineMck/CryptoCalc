@@ -1,6 +1,13 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
 import {ArrowLeft, ArrowRight, Mail} from 'lucide-react';
+import axios from "axios";
+
+axios.defaults.withCredentials = true;
+
+const client = axios.create({
+    baseURL: "http://127.0.0.1:5000",
+});
 
 const ForgotPasswordPage = () => {
     const navigate = useNavigate();
@@ -13,8 +20,18 @@ const ForgotPasswordPage = () => {
         setIsLoading(true);
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            setSuccess(true);
+ 
+         client.post("/reset", {
+                    'email': email
+                }, {withCredentials: true})
+                    .then(async (response) => {
+                        setError(response.data.message);
+                        await new Promise(resolve => setTimeout(resolve, 3000)); 
+                        setSuccess(true);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
         } catch (err) {
             console.error('Reset password error:', err);
         } finally {
