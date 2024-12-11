@@ -26,33 +26,31 @@ tokens = {}
 
 
 # Password Reset Request Route
-@app.route('/reset', methods=['GET', 'POST'])
+@app.route('/reset', methods=['POST'])
 def request_reset():
-    if request.method == 'POST':
-        data = request.get_json()
-        email = data['email']
+    data = request.get_json()
+    email = data['email']
 
-        if not find_email(email):
-            return jsonify({'message': "This email is not registered", "reset": False})
+    if not find_email(email):
+        return jsonify({'message': "This email is not registered", "reset": False})
 
-        token = secrets.token_urlsafe(16)
-        tokens[email] = token
+    token = secrets.token_urlsafe(16)
+    tokens[email] = token
 
-        reset_url = url_for('reset_with_token', token=token, _external=True)
+    reset_url = url_for('reset_with_token', token=token, _external=True)
 
-        msg = Message("CryptoCalc - Password Reset Request", sender=app.config['MAIL_USERNAME'], recipients=[email])
-        msg.body = f"Click the link to reset your password: {reset_url}"
-        mail.send(msg)
-    return jsonify({"message": "Check your email for a password reset link", "reset": True})
+    msg = Message("CryptoCalc - Password Reset Request", sender=app.config['MAIL_USERNAME'], recipients=[email])
+    msg.body = f"Click the link to reset your password: {reset_url}"
+    mail.send(msg)
 
 
 # Password Reset with Token Route
-@app.route('/reset/<token>', methods=['GET', 'POST'])
+@app.route('/reset/<token>', methods=['POST'])
 def reset_with_token(token):
     email = next((email for email, t in tokens.items() if t == token), None)
     if not email:
         return jsonify({"message": "Invalid or expired token!", "reset": False})
-    if request.method == 'POST':
+    else:
         data = request.get_json()
         new_password = data['password']
         pass_valid, msg = is_password_strong(new_password)
@@ -65,7 +63,6 @@ def reset_with_token(token):
         return jsonify(
             {"message": "Password has been reset successfully!", "reset": True, "email": email, "username": user[0],
              "username_hash": user[1]})
-    return jsonify({"message": "Invalid or expired token!", "reset": False})
 
 
 @app.route('/signup', methods=['POST'])
