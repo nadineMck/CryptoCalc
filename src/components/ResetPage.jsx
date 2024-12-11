@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {AlertCircle, ArrowRight, Eye, EyeOff, Home, Lock, Mail, User} from 'lucide-react';
+import {AlertCircle, ArrowRight, Eye, EyeOff, Home, Lock} from 'lucide-react';
 import Cookies from 'js-cookie';
 
 import axios from "axios";
@@ -16,7 +16,7 @@ export const validate_cookie = async () => {
     try {
         const response = await client.post("/cookie", {
             username_hash: username_hash
-        }, { withCredentials: true });
+        }, {withCredentials: true});
         return response.data.authenticated;
     } catch (error) {
         return false;
@@ -34,14 +34,14 @@ export const get_user_data = async () => {
     }
 };
 
-const ResetPage = ( ) => {
+const ResetPage = ({onLogin}) => {
     const [showPassword, setShowPassword] = React.useState(false);
-    const [_currentUser, setCurrentUser] = React.useState(false);  
+    const [_currentUser, setCurrentUser] = React.useState(false);
     const navigate = useNavigate();
-    const { token } = useParams(); 
+    const {token} = useParams();
     // Form state
     const [formData, setFormData] = React.useState({
-       password: '' 
+        password: ''
     });
 
     // Error states
@@ -89,45 +89,30 @@ const ResetPage = ( ) => {
             navigate('/dashboard');
         }
 
-        try { 
+        try {
             console.log(token)
             client.post("/reset/" + token, {
                 'password': formData.password
             }, {withCredentials: true})
                 .then(async (response) => {
-
-                    await new Promise(resolve => setTimeout(resolve, 1500)); 
-                    navigate('/dashboard');
+                    if (response.data.reset) {
+                        const userData = {
+                            username: response.data.username, email: response.data.email
+                        };
+                        await onLogin(userData);
+                        Cookies.set('auth_token', response.data.username_hash, {
+                            path: '/', sameSite: 'Lax'
+                        });
+                        navigate('/dashboard');
+                    } else {
+                        setError(response.data.message);
+                    }
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    setError(error);
                 });
-                // client.post("/login", {
-                //     'email': formData.email, 'password': formData.password
-                // }, {withCredentials: true})
-                //     .then(async (response) => {
-                //         if (response.data.authenticated === true) {
-                //             if (rememberMe) Cookies.set('auth_token', response.data.username_hash, {
-                //                 expires: 7, path: '/', sameSite: 'Lax'
-                //             }); else Cookies.set('auth_token', response.data.username_hash, {
-                //                 path: '/', sameSite: 'Lax'
-                //             });
-                //             const userData = {
-                //                 username: response.data.username,
-                //                 email: formData.email
-                //             };
-                //             await onLogin(userData);
-                //             navigate('/dashboard');
-                //         } else {
-                //             setError(response.data.message)
-                //         }
-                //     })
-                //     .catch(function (error) {
-                //         setError(error);
-                //     }); 
         } catch (err) {
             setError('Something went wrong. Please try again.');
-            console.error('Auth error:', err);
         } finally {
             setIsLoading(false);
         }
@@ -180,7 +165,7 @@ const ResetPage = ( ) => {
                             </h1>
                         </div>
                     </div>
- 
+
 
                     {error && (<div
                         className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg flex items-center gap-2 text-red-200">
@@ -190,7 +175,7 @@ const ResetPage = ( ) => {
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {<>
-                                
+
 
                             <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
@@ -214,9 +199,9 @@ const ResetPage = ( ) => {
 
                             <div className="flex justify-between items-center text-sm">
                                 <label className="flex items-center text-gray-400 hover:text-white cursor-pointer">
-                            
+
                                 </label>
-                           
+
                             </div>
                         </>}
 
@@ -226,7 +211,7 @@ const ResetPage = ( ) => {
                             className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-lg py-3 px-4 transition-all duration-300 flex items-center justify-center gap-2 group ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
                             {isLoading ? (<span>Loading...</span>) : (<>
-                                { 'Reset Password'}
+                                {'Reset Password'}
                                 <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20}/>
                             </>)}
                         </button>

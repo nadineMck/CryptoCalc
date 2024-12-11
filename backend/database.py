@@ -365,18 +365,17 @@ def validate_username_hash(username_hash):
         if conn:
             conn.close()
 
-# Update user details
-def update_user_password(email, new_password):
-    if email and new_password:
-        sql = "UPDATE User_Auth SET password = %s WHERE email = %s"
+
+def update_user_password(email, new_password, salt):
+    sql = "UPDATE User_Auth SET password = %s, salt = %s WHERE email = %s"
     conn = None
     cur = None
     try:
         conn = connect()
         if not conn:
             return False
-        cur = conn.cursor() 
-        cur.execute(sql, (email, new_password)) 
+        cur = conn.cursor()
+        cur.execute(sql, (new_password, salt, email))
         conn.commit()
         return True
     except psycopg2.Error as e:
@@ -387,6 +386,8 @@ def update_user_password(email, new_password):
             cur.close()
         if conn:
             conn.close()
+
+
 # Update user details
 def update_user(username, new_email=None, new_password=None):
     if new_email and new_password:
@@ -458,6 +459,28 @@ def get_user_details(username_hash):
         return result
     except psycopg2.Error as e:
         print(f"Error retrieving salt: {e}")
+        return None
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+def find_email(email):
+    sql = "SELECT email FROM User_Auth WHERE email = %s"
+    conn = None
+    cur = None
+    try:
+        conn = connect()
+        if not conn:
+            return None
+        cur = conn.cursor()
+        cur.execute(sql, (email,))
+        user = cur.fetchone()
+        return user is not None
+    except psycopg2.Error as e:
+        print(f"Error fetching user {email}: {e}")
         return None
     finally:
         if cur:

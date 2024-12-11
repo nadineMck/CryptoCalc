@@ -1,6 +1,6 @@
 import React from 'react';
 import {useNavigate} from 'react-router-dom';
-import {ArrowLeft, ArrowRight, Mail} from 'lucide-react';
+import {AlertCircle, ArrowLeft, ArrowRight, Mail} from 'lucide-react';
 import axios from "axios";
 
 axios.defaults.withCredentials = true;
@@ -14,6 +14,7 @@ const ForgotPasswordPage = () => {
     const [email, setEmail] = React.useState('');
     const [isLoading, setIsLoading] = React.useState(false);
     const [success, setSuccess] = React.useState(false);
+    const [error, setError] = React.useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,15 +26,20 @@ const ForgotPasswordPage = () => {
                     'email': email
                 }, {withCredentials: true})
                     .then(async (response) => {
-                        setError(response.data.message);
-                        await new Promise(resolve => setTimeout(resolve, 3000)); 
-                        setSuccess(true);
+                        if (!response.data.reset) {
+                            setError(response.data.message);
+                            setSuccess(false);
+                        } else {
+                            setError('');
+                            await new Promise(resolve => setTimeout(resolve, 3000));
+                            setSuccess(true);
+                        }
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        setError(error);
                     });
         } catch (err) {
-            console.error('Reset password error:', err);
+            setError(error);
         } finally {
             setIsLoading(false);
         }
@@ -60,6 +66,12 @@ const ForgotPasswordPage = () => {
                             Enter your email address and we will send you instructions to reset your password.
                         </p>
                     </div>
+
+                    {error && (<div
+                        className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg flex items-center gap-2 text-red-200">
+                        <AlertCircle size={20}/>
+                        <span>{error}</span>
+                    </div>)}
 
                     {success ? (
                         <div className="text-center py-4">

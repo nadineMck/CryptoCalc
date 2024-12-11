@@ -6,66 +6,67 @@ from flask_mail import Mail, Message
 import secrets
 import polynomial
 from auth import hash_password, is_password_strong
-from database import (update_user_password, add_user, authenticate_user, add_user_operation, list_operations_by_username_hash, find_user,
-                      get_password_salt, validate_username_hash, get_user_details, remove_user)
+from database import (update_user_password, add_user, authenticate_user, add_user_operation,
+                      list_operations_by_username_hash, find_user,
+                      get_password_salt, validate_username_hash, get_user_details, remove_user, find_email)
 from polynomial import Polynomial
 
 app = Flask(__name__)
-# Flask-Mail Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 't3067272@gmail.com'  # Replace with your Gmail
-app.config['MAIL_PASSWORD'] = 'mlkn suou dcoe nand'  # Replace with your App Password
-app.secret_key = "your_secret_key_here"
+app.config['MAIL_USERNAME'] = 't3067272@gmail.com'
+app.config['MAIL_PASSWORD'] = 'mlkn suou dcoe nand'
+app.secret_key = "sample_key"
 mail = Mail(app)
 CORS(app, supports_credentials=True)
-# Temporary storage for tokens 
 tokens = {}
+
+
 # Password Reset Request Route
 @app.route('/reset', methods=['GET', 'POST'])
 def request_reset():
-    if request.method == 'POST': 
-        data = request.get_json() 
+    if request.method == 'POST':
+        data = request.get_json()
         email = data['email']
 
-        # Generate a secure random token
+        if not find_email(email):
+            return jsonify({'message': "This email is not registered", "reset": False})
+
         token = secrets.token_urlsafe(16)
         tokens[email] = token
 
-        # Generate the reset URL
         reset_url = url_for('reset_with_token', token=token, _external=True)
 
-        # Create and send the email
         msg = Message(
-            "Password Reset Request",
+            "CryptoCalc - Password Reset Request",
             sender=app.config['MAIL_USERNAME'],
             recipients=[email]
         )
         msg.body = f"Click the link to reset your password: {reset_url}"
-        mail.send(msg) 
-    
-    # Display the password reset form
-    return jsonify({"message": "Worked" })
+        mail.send(msg)
+    return jsonify({"message": "Check your email for a password reset link", "reset": True})
+
 
 # Password Reset with Token Route
 @app.route('/reset/<token>', methods=['GET', 'POST'])
 def reset_with_token(token):
-    # Find the email associated with the token
     email = next((email for email, t in tokens.items() if t == token), None)
     if not email:
-        return jsonify({"message": "Invalid or expired token!" })  
-    if request.method == 'POST': 
-        data = request.get_json() 
+        return jsonify({"message": "Invalid or expired token!", "reset": False})
+    if request.method == 'POST':
+        data = request.get_json()
         new_password = data['password']
-        # Logic to save the new password (placeholder for now)
-        print(f"Updated password for {email}: {new_password}")
-        update_user_password(email, new_password)
-        del tokens[email]  # Invalidate the token 
-        return jsonify({"message": "Password has been reset successfully!" })  
-    return jsonify({"message": "Invalid or expired token!" })  
-
- 
+        pass_valid, msg = is_password_strong(new_password)
+        if not pass_valid:
+            return jsonify({"message": "Password does not meet complexity requirements: " + msg, "reset": False})
+        hashed_password, salt = hash_password(data['password'])
+        update_user_password(email, hashed_password, salt)
+        user = authenticate_user(email, hashed_password)
+        del tokens[email]
+        return jsonify({"message": "Password has been reset successfully!", "reset": True, "email": email,
+                        "username": user[0], "username_hash": user[1]})
+    return jsonify({"message": "Invalid or expired token!", "reset": False})
 
 
 @app.route('/signup', methods=['POST'])
@@ -105,7 +106,7 @@ def login():
     salt = get_password_salt(email)
     if salt is not None:
         hashed_password, _ = hash_password(password, salt)
-        user = authenticate_user(email, str(hashed_password))
+        user = authenticate_user(email, hashed_password)
         if user:
             return jsonify({"message": "Login successful.", "authenticated": True,
                             "username": user[0], "username_hash": user[1]})

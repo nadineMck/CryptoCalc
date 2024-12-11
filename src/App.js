@@ -65,8 +65,8 @@ const App = () => {
                 <Route
                     path="/reset/:token"
                     element={
-                        <ResetPage 
-                           
+                        <ResetPage
+                            onLogin={handleLogin}
                         />
                     }
                 />
