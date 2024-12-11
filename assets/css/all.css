@@ -41,9 +41,8 @@
     background: rgba(13, 22, 44, 0.7);
     padding: 10px;
     border-radius: 10px;
-    box-shadow:
-        0 15px 35px rgba(0, 0, 0, 0.3),
-        0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3),
+    0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .operations button {
@@ -159,9 +158,8 @@ button {
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(10px);
-    box-shadow:
-        0 4px 6px rgba(0, 0, 0, 0.2),
-        inset 0 1px 3px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2),
+    inset 0 1px 3px rgba(255, 255, 255, 0.1);
 }
 
 button::before {
@@ -172,9 +170,9 @@ button::before {
     width: 100%;
     height: 100%;
     background: linear-gradient(120deg,
-            transparent,
-            rgba(100, 255, 218, 0.2),
-            transparent);
+    transparent,
+    rgba(100, 255, 218, 0.2),
+    transparent);
     transition: all 0.6s ease;
 }
 
@@ -184,9 +182,8 @@ button:hover::before {
 
 button:active {
     transform: scale(0.95);
-    box-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.2),
-        inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(0, 0, 0, 0.2);
     background-color: rgba(45, 57, 85, 0.8);
 }
 
@@ -243,10 +240,10 @@ body {
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     background: linear-gradient(-45deg,
-            #0f1729,
-            #1a2b4a,
-            #0c1326,
-            #233355);
+    #0f1729,
+    #1a2b4a,
+    #0c1326,
+    #233355);
     background-size: 400% 400%;
     color: var(--text-primary);
     display: flex;
@@ -281,9 +278,8 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image:
-        radial-gradient(#ffffff 1px, transparent 1px),
-        radial-gradient(#ffffff 1px, transparent 1px);
+    background-image: radial-gradient(#ffffff 1px, transparent 1px),
+    radial-gradient(#ffffff 1px, transparent 1px);
     background-size: 50px 50px;
     background-position: 0 0, 25px 25px;
     opacity: 0.1;
@@ -310,9 +306,9 @@ body::after {
     height: 100%;
     pointer-events: none;
     background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            rgba(100, 255, 218, 0.2) 0%,
-            rgba(126, 87, 194, 0.1) 50%,
-            transparent 80%);
+    rgba(100, 255, 218, 0.2) 0%,
+    rgba(126, 87, 194, 0.1) 50%,
+    transparent 80%);
     z-index: -1;
     opacity: 0.7;
     transition: background 0.1s ease;
@@ -327,9 +323,9 @@ body::after {
     height: 100%;
     pointer-events: none;
     background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            rgba(255, 100, 255, 0.3) 0%,
-            rgba(126, 87, 194, 0.15) 10%,
-            transparent 25%);
+    rgba(255, 100, 255, 0.3) 0%,
+    rgba(126, 87, 194, 0.15) 10%,
+    transparent 25%);
     opacity: 0.8;
     z-index: 1;
     transition: all 0.3s ease;
@@ -370,9 +366,8 @@ body:hover::after {
     background: rgba(13, 22, 44, 0.7);
     border-radius: 20px;
     padding: 40px;
-    box-shadow:
-        0 15px 35px rgba(0, 0, 0, 0.5),
-        0 5px 15px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5),
+    0 5px 15px rgba(0, 0, 0, 0.4);
     width: 800px;
     backdrop-filter: blur(15px) saturate(180%);
     border: 1px solid var(--glass-border);
@@ -390,26 +385,24 @@ body:hover::after {
     width: 200%;
     height: 200%;
     background: linear-gradient(0deg,
-            transparent,
-            rgba(100, 255, 218, 0.1),
-            rgba(126, 87, 194, 0.1));
+    transparent,
+    rgba(100, 255, 218, 0.1),
+    rgba(126, 87, 194, 0.1));
     transform: rotate(-45deg);
     z-index: -1;
 }
 
 .container:hover {
     transform: rotateX(0) rotateY(0);
-    box-shadow:
-        0 20px 45px rgba(0, 0, 0, 0.6),
-        0 10px 25px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6),
+    0 10px 25px rgba(0, 0, 0, 0.5);
 }
 
 h1 {
     font-size: 1.8em;
     color: var(--accent-primary);
-    text-shadow:
-        0 0 10px rgba(100, 255, 218, 0.6),
-        0 0 20px rgba(100, 255, 218, 0.4);
+    text-shadow: 0 0 10px rgba(100, 255, 218, 0.6),
+    0 0 20px rgba(100, 255, 218, 0.4);
     text-align: center;
     letter-spacing: 2px;
     margin-bottom: 30px;
@@ -425,9 +418,9 @@ h1::after {
     width: 100px;
     height: 3px;
     background: linear-gradient(to right,
-            transparent,
-            var(--accent-primary),
-            transparent);
+    transparent,
+    var(--accent-primary),
+    transparent);
 }
 
 input[type="text"],
@@ -442,9 +435,8 @@ textarea {
     width: 50%;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
-    box-shadow:
-        0 4px 6px var(--glass-shadow),
-        inset 0 1px 3px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px var(--glass-shadow),
+    inset 0 1px 3px rgba(255, 255, 255, 0.1);
 }
 
 input[type="text"]:focus,
@@ -452,9 +444,8 @@ input[type="number"]:focus,
 textarea:focus {
     outline: none;
     border-color: var(--accent-primary);
-    box-shadow:
-        0 0 15px rgba(100, 255, 218, 0.5),
-        inset 0 1px 3px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(100, 255, 218, 0.5),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2);
 }
 
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Calculator, Shield, Zap } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import {Calculator, Shield, Zap} from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
 
 const MainPage = () => {
     const navigate = useNavigate();
@@ -58,17 +58,17 @@ const MainPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
                             {
-                                icon: <Calculator className="w-8 h-8 text-blue-400" />,
+                                icon: <Calculator className="w-8 h-8 text-blue-400"/>,
                                 title: "Advanced Calculations",
                                 description: "Perform complex polynomial arithmetic over Galois Fields with ease and precision."
                             },
                             {
-                                icon: <Zap className="w-8 h-8 text-purple-400" />,
+                                icon: <Zap className="w-8 h-8 text-purple-400"/>,
                                 title: "Lightning Fast",
                                 description: "Get instant results with our calculation engine."
                             },
                             {
-                                icon: <Shield className="w-8 h-8 text-indigo-400" />,
+                                icon: <Shield className="w-8 h-8 text-indigo-400"/>,
                                 title: "Secure & Reliable",
                                 description: "Trust in our robust and secure platform for all your needs."
                             }
