@@ -182,11 +182,11 @@ class Polynomial(object):
         If a length is not given the polynomial is expanded until the limit of its mod space.
         :param length: length to expand to
         """
-        k = self.highest_power
-        if length is not None and length > k:
-            self.p.extend([False] * (length - k - 1))
-        else:
-            self.p.extend([False] * (self.mod.highest_power - k - 1))
+        k = len(self)
+        if length is not None and length >= k:
+            self.p.extend([False] * (length - k + 1))
+        elif self.mod is not None:
+            self.p.extend([False] * (self.mod.highest_power - k + 1))
 
     def bin(self) -> str:
         """
@@ -682,6 +682,6 @@ class Polynomial(object):
 
 # test cases
 if __name__ == "__main__":
-    P1 = Polynomial(s="x**6 + x**5", mod=Polynomial(s="x**8"))  # x**5 + x**4 + 1
-    P2 = Polynomial(s="x**5", mod=Polynomial(s="x**8"))
-    print(P1 / P2)
+    P1 = Polynomial(s="X6+x4+x2+x+1", mod=Polynomial(s="x8+x4+x3+x+1"))  # x**5 + x**4 + 1
+    P2 = Polynomial(s="x7+x+1", mod=Polynomial(s="x8+x4+x3+x+1"))
+    print(P1 * P2)
