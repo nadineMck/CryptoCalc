@@ -21,7 +21,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const client = axios.create({
-    baseURL: "https://cryptocalc-p0qp.onrender.com/",
+    baseURL: "https://cryptocalc-p0qp.onrender.com",
 });
 
 const HistoryPage = ({}) => {

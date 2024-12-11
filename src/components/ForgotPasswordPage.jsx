@@ -6,7 +6,7 @@ import axios from "axios";
 axios.defaults.withCredentials = true;
 
 const client = axios.create({
-    baseURL: "https://cryptocalc-p0qp.onrender.com/",
+    baseURL: "https://cryptocalc-p0qp.onrender.com",
 });
 
 const ForgotPasswordPage = () => {
