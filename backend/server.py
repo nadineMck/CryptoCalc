@@ -218,11 +218,11 @@ def calculate():
         mod = parseInputPolynomial(modFormat, data.get("irreduciblePoly", ""))
         if not mod.p:
             return jsonify({"result": "Specify modulo field from Parameters panel"})
-        steps.append({"description": "Parse modulo polynomial", "value": str(mod)})
+        steps.append({"description": "Parse modulo polynomial", "value": replace_powers(str(mod))})
         polynomial1 = parseInputPolynomial(inputFormat, data.get("polynomial1", ""), mod)
-        steps.append({"description": "Parse polynomial 1 in field", "value": str(polynomial1)})
+        steps.append({"description": "Parse polynomial 1 in field", "value": replace_powers(str(polynomial1))})
         polynomial2 = parseInputPolynomial(inputFormat, data.get("polynomial2", ""), mod)
-        steps.append({"description": "Parse polynomial 2 in field", "value": str(polynomial2)})
+        steps.append({"description": "Parse polynomial 2 in field", "value": replace_powers(str(polynomial2))})
 
         result = doOperation(polynomial1, polynomial2, operation)
         result = getResult(outputFormat, result)
