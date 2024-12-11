@@ -365,7 +365,28 @@ def validate_username_hash(username_hash):
         if conn:
             conn.close()
 
-
+# Update user details
+def update_user_password(email, new_password):
+    if email and new_password:
+        sql = "UPDATE User_Auth SET password = %s WHERE email = %s"
+    conn = None
+    cur = None
+    try:
+        conn = connect()
+        if not conn:
+            return False
+        cur = conn.cursor() 
+        cur.execute(sql, (email, new_password)) 
+        conn.commit()
+        return True
+    except psycopg2.Error as e:
+        print(f"Error updating email for {email}: {e}")
+        return False
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
 # Update user details
 def update_user(username, new_email=None, new_password=None):
     if new_email and new_password:

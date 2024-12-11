@@ -6,7 +6,7 @@ from flask_mail import Mail, Message
 import secrets
 import polynomial
 from auth import hash_password, is_password_strong
-from database import (add_user, authenticate_user, add_user_operation, list_operations_by_username_hash, find_user,
+from database import (update_user_password, add_user, authenticate_user, add_user_operation, list_operations_by_username_hash, find_user,
                       get_password_salt, validate_username_hash, get_user_details, remove_user)
 from polynomial import Polynomial
 
@@ -25,8 +25,9 @@ tokens = {}
 # Password Reset Request Route
 @app.route('/reset', methods=['GET', 'POST'])
 def request_reset():
-    if request.method == 'POST':
-        email = request.form['email']
+    if request.method == 'POST': 
+        data = request.get_json() 
+        email = data['email']
 
         # Generate a secure random token
         token = secrets.token_urlsafe(16)
@@ -54,11 +55,12 @@ def reset_with_token(token):
     email = next((email for email, t in tokens.items() if t == token), None)
     if not email:
         return jsonify({"message": "Invalid or expired token!" })  
-    if request.method == 'POST':
-        new_password = request.form['password']
+    if request.method == 'POST': 
+        data = request.get_json() 
+        new_password = data['password']
         # Logic to save the new password (placeholder for now)
         print(f"Updated password for {email}: {new_password}")
-        
+        update_user_password(email, new_password)
         del tokens[email]  # Invalidate the token 
         return jsonify({"message": "Password has been reset successfully!" })  
     return jsonify({"message": "Invalid or expired token!" })  
