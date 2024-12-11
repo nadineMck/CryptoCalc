@@ -2,9 +2,9 @@ import psycopg2
 from flask import flash
 
 databaseName = "crypto"
-db_user = "postgres"
-db_password = "12345678"
-host = "localhost"
+db_user = "postgres.umvluanafdpwshcjysvf"
+db_password = "lRxkLYo8ZsdRvAG3"
+host = "aws-0-eu-central-1.pooler.supabase.com"
 port = 5432
 
 
