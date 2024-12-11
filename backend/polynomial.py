@@ -89,32 +89,17 @@ def _parse_list(c: list) -> list:
     return L
 
 
-# this list represents all the mod polynomials for GF(2^2) thru GF(2^8)
-Classic_Galois = [
-    [],
-    [],
-    [True, True, True],
-    [True, False, True, True],
-    [True, False, False, True, True],
-    [True, False, True, False, False, True],
-    [True, True, False, False, False, False, True],
-    [True, True, False, False, False, False, False, True],
-    [True, True, False, True, True, False, False, False, True],
-]
-
 steps = []
 
 
 class Polynomial(object):
     def __init__(
-        self,
-        b: str = None,
-        s: str = None,
-        L: list = None,
-        mod: object = None,
-        expand_to_mod: bool = True,
-        field: int = None,
-        use_classic_galois: bool = False,
+            self,
+            b: str = None,
+            s: str = None,
+            L: list = None,
+            mod: object = None,
+            expand_to_mod: bool = False,
     ) -> None:
         """
         Creates a new mod 2 coefficient polynomial object. The polynomial is pre-initialized with a value if
@@ -136,10 +121,6 @@ class Polynomial(object):
         :param expand_to_mod: if true, the polynomial's internal representation expands to the highest permissible
         power in the field it is contained in (e.g. len(self.p)=8 for GF(2^8)). this affects certain operations as well
         as representations, such as the bin(p) function.
-        :param field: a number from 2 to 8, representing the classic galois field to work under.
-        it is mandatory to specify this number if working under a  classical field to prevent side effects of guessing
-        :param use_classic_galois: if true, no mod polynomial is specified, and the polynomial is appropriately sized,
-        then try to guess the field the polynomial belongs to by fitting it in the smallest possible field.
         """
         self.p = []
         if b:
@@ -159,13 +140,6 @@ class Polynomial(object):
                 self.__mod__(self.mod, inplace=True)
             if expand_to_mod:
                 self.expand()
-        # guess mod polynomial, based on field or polynomial size
-        elif field is not None or (use_classic_galois and 0 < k < len(Classic_Galois)):
-            if field is not None:
-                self.mod = Polynomial(L=Classic_Galois[field], use_classic_galois=False)
-            else:
-                self.mod = Polynomial(L=Classic_Galois[k + 1], use_classic_galois=False)
-            # perform mod from the start if the polynomial is too long
             if k >= len(self.mod):
                 self.__mod__(self.mod, inplace=True)
             if expand_to_mod:
@@ -232,7 +206,7 @@ class Polynomial(object):
         return Polynomial(L=self.p.copy(), mod=self.mod)
 
     def __add__(
-        self, other: object, inplace: bool = False, mod: bool = True, step=True
+            self, other: object, inplace: bool = False, mod: bool = True, step=True
     ) -> object:
         """
         Performs the addition self + other.
@@ -251,7 +225,7 @@ class Polynomial(object):
         return val
 
     def __sub__(
-        self, other: object, inplace: bool = False, mod: bool = True, step=True
+            self, other: object, inplace: bool = False, mod: bool = True, step=True
     ) -> object:
         """
         Performs the subtraction self - other.
@@ -270,7 +244,7 @@ class Polynomial(object):
         return val
 
     def __mul__(
-        self, other: object, inplace: bool = False, mod: bool = True, step=True
+            self, other: object, inplace: bool = False, mod: bool = True, step=True
     ) -> object:
         """
         Performs the multiplication self * other.
@@ -335,7 +309,7 @@ class Polynomial(object):
             self.p = c.p
 
     def __truediv__(
-        self, other: object, inplace: bool = False, mod: bool = True, step=True
+            self, other: object, inplace: bool = False, mod: bool = True, step=True
     ) -> object:
         """
         Performs the division self / other.
@@ -375,7 +349,7 @@ class Polynomial(object):
         # handle inplace as appropriate
         if step:
             steps.append(
-                ("End up with " + str(self) + " / " + str(other), str(Polynomial(L=c)))
+                ("End up with " + str(self) + " / " + str(other), str(q.copy()))
             )
         if not inplace:
             return q
@@ -437,7 +411,7 @@ class Polynomial(object):
             raise ValueError("No inverse for given polynomial modulo defined modulus")
 
     def __mod__(
-        self, other: object, inplace: bool = False, mod: bool = True, step=True
+            self, other: object, inplace: bool = False, mod: bool = True, step=True
     ) -> object:
         """
         Performs the modulus self mod other, i.e. self % other. By default, if self does not have a field
@@ -531,7 +505,7 @@ class Polynomial(object):
         return self.__ret__mod(c, inplace, mod)
 
     def __xor__(
-        self, other: object, inplace: bool = False, mod: bool = True, step=True
+            self, other: object, inplace: bool = False, mod: bool = True, step=True
     ) -> object:
         """
         Performs the XOR self ^ other, assuming binary representation of both. If one of them is longer than the other,
@@ -669,7 +643,7 @@ class Polynomial(object):
                 return []
             if i.stop and i.stop >= len(self):
                 self.expand(i.stop)
-            return self.p[i.start : i.stop : i.step]
+            return self.p[i.start: i.stop: i.step]
         else:
             raise ValueError("Can only get at an integer index or a slice")
 
@@ -692,7 +666,7 @@ class Polynomial(object):
             for k in val:
                 if not isinstance(k, bool):
                     raise ValueError("Coefficient can only be a boolean")
-            self.p[i.start : i.stop : i.step] = val
+            self.p[i.start: i.stop: i.step] = val
         else:
             raise ValueError("Can only set at an integer index or a slice")
 
@@ -708,14 +682,6 @@ class Polynomial(object):
 
 # test cases
 if __name__ == "__main__":
-    P1 = Polynomial(b="0b11001", field=6)  # x**5 + x**4 + 1
-    P2 = Polynomial(s="x**5 + x**4 + 1", field=6)
-    P3 = Polynomial(L=[True, False, True, True])  # 1 + x**2 + x**4
-    print(P1)
-    print(P2)
-    print(P3)
-    print(P1 + P2)
-    print(P1 * P2)
-    print(P1 / P3)
-    print(P1 % P2)
-    print(Polynomial(s="x**8", field=5))
+    P1 = Polynomial(s="x**6 + x**5", mod=Polynomial(s="x**8"))  # x**5 + x**4 + 1
+    P2 = Polynomial(s="x**5", mod=Polynomial(s="x**8"))
+    print(P1 / P2)

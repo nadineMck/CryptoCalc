@@ -4,7 +4,7 @@ WITH
 
 CREATE TABLE
   IF NOT EXISTS User_Operations (
-    uuid VARCHAR(128),
+    username_hash VARCHAR(128),
     operation_id SERIAL,
     date_created TIMESTAMP,
     field VARCHAR(10),
@@ -15,5 +15,14 @@ CREATE TABLE
     result VARCHAR(500),
     inputFormat VARCHAR(50),
     outputFormat VARCHAR(50),
-    PRIMARY KEY (uuid, operation_id)
+    PRIMARY KEY (username_hash, operation_id)
   );
+
+CREATE TABLE IF NOT EXISTS User_Auth (
+    username VARCHAR(50) NOT NULL,
+    username_hash CHAR(64) NOT NULL,
+    email VARCHAR(320) NOT NULL,
+    password CHAR(64) NOT NULL,
+    salt VARCHAR(32) NOT NULL,
+    PRIMARY KEY (email)
+);

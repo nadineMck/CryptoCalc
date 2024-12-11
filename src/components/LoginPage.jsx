@@ -11,17 +11,39 @@ const client = axios.create({
     baseURL: "http://127.0.0.1:5000",
 });
 
+export const validate_cookie = async () => {
+    const username_hash = Cookies.get("auth_token");
+    try {
+        const response = await client.post("/cookie", {
+            username_hash: username_hash
+        }, { withCredentials: true });
+        return response.data.authenticated;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const get_user_data = async () => {
+    const username_hash = Cookies.get("auth_token");
+    try {
+        return await client.post("/user_details", {
+            username_hash: username_hash
+        }, {withCredentials: true});
+    } catch (error) {
+        return null;
+    }
+};
+
 const LoginPage = ({initialTab = 'login', onLogin}) => {
     const [showPassword, setShowPassword] = React.useState(false);
     const [_currentUser, setCurrentUser] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState(initialTab);
+    const [rememberMe, setRememberMe] = React.useState(false)
     const navigate = useNavigate();
 
     // Form state
     const [formData, setFormData] = React.useState({
-        email: '',
-        password: '',
-        username: ''
+        email: '', password: '', username: ''
     });
 
     // Error states
@@ -30,8 +52,14 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
     useEffect(() => {
         const performNavigate = async () => {
             try {
-                const username = Cookies.get("auth_token"); // Retrieve the "username" cookie
-                if (username) {
+                if (await validate_cookie()) {
+                    try {
+                        const response = await get_user_data();
+                        const userData = {username: response.data.username, email: response.data.email};
+                        onLogin(userData);
+                    } catch (error) {
+                        onLogin(null);
+                    }
                     setCurrentUser(true);
                     navigate("/dashboard");
                 } else {
@@ -43,26 +71,15 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
             }
         };
 
-        performNavigate();
+        performNavigate().then();
     }, [navigate]);
 
     const handleInputChange = (e) => {
         const {name, value} = e.target;
         setFormData(prev => ({
-            ...prev,
-            [name]: value
+            ...prev, [name]: value
         }));
         setError('');
-    };
-
-    const validatePassword = (password) => {
-        const hasMinLength = password.length >= 8;
-        const hasUpperCase = /[A-Z]/.test(password);
-
-        if (!hasMinLength || !hasUpperCase) {
-            return false;
-        }
-        return true;
     };
 
     const handleSubmit = async (e) => {
@@ -70,53 +87,59 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
         setError('');
         setIsLoading(true);
 
-        try {
-            const username = Cookies.get("auth_token"); // Retrieve the "username" cookie
-            if (username) {
-                navigate('/dashboard');
-            } else {
-                if (activeTab === 'login') {
-                    await new Promise(resolve => setTimeout(resolve, 1000)); // Fake delay
-                    client.post("/login", {
-                        'email': formData.email, 'password': formData.password
-                    }, {withCredentials: true})
-                        .then((response) => {
-                            if (response.data.message === "Login successful") {
-                                Cookies.set('username', formData.email, {expires: 1, path: '/', sameSite: 'Lax'});
-                                const userData = {name: 'Test User', email: formData.email};
-                                navigate('/dashboard');
-                            } else {
-                                setError(response.data.message)
-                            }
-                        })
-                        .catch(function (error) {
-                            setError("Login failed: error");
-                        });
-                } else {
-                    // Sign up validation
-                    if (!validatePassword(formData.password)) {
-                        setError('Password must be at least 8 characters and contain one uppercase letter');
-                    } else {
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                        client.post("/signup", {
-                            'username': formData.username, 'email': formData.email, 'password': formData.password
-                        }, {withCredentials: true})
-                            .then((response) => {
-                                if (response.data.message == "Signup successful") {
-                                    Cookies.set('username', formData.email, {expires: 1, path: '/', sameSite: 'Lax'});
-                                    const userData = {name: 'Test User', email: formData.email};
-                                    navigate('/dashboard');
-                                } else {
-                                    setError(response.data.message)
-                                }
-                            })
-                            .catch(function (error) {
-                                setError("Signup failed: error");
-                            });
-                    }
-                }
-            }
+        if (await validate_cookie()) {
+            navigate('/dashboard');
+        }
 
+        try {
+            if (activeTab === 'login') {
+                client.post("/login", {
+                    'email': formData.email, 'password': formData.password
+                }, {withCredentials: true})
+                    .then(async (response) => {
+                        if (response.data.authenticated === true) {
+                            if (rememberMe) Cookies.set('auth_token', response.data.username_hash, {
+                                expires: 7, path: '/', sameSite: 'Lax'
+                            }); else Cookies.set('auth_token', response.data.username_hash, {
+                                path: '/', sameSite: 'Lax'
+                            });
+                            const userData = {
+                                username: response.data.username,
+                                email: formData.email
+                            };
+                            await onLogin(userData);
+                            navigate('/dashboard');
+                        } else {
+                            setError(response.data.message)
+                        }
+                    })
+                    .catch(function (error) {
+                        setError(error);
+                    });
+            } else {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                client.post("/signup", {
+                    'username': formData.username, 'email': formData.email, 'password': formData.password
+                }, {withCredentials: true})
+                    .then(async (response) => {
+                        if (response.data.signup === true) {
+                            Cookies.set('auth_token', response.data.username_hash, {
+                                expires: 7, path: '/', sameSite: 'Lax'
+                            });
+                            const userData = {
+                                username: formData.username,
+                                email: formData.email
+                            };
+                            await onLogin(userData);
+                            navigate('/dashboard');
+                        } else {
+                            setError(response.data.message)
+                        }
+                    })
+                    .catch(function (error) {
+                        setError(error);
+                    });
+            }
         } catch (err) {
             setError('Something went wrong. Please try again.');
             console.error('Auth error:', err);
@@ -177,10 +200,7 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                                 setActiveTab('login');
                                 setError('');
                             }}
-                            className={`flex-1 py-2 px-4 rounded-md transition-all duration-300 ${activeTab === 'login'
-                                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                : 'text-gray-400 hover:text-white'
-                            }`}
+                            className={`flex-1 py-2 px-4 rounded-md transition-all duration-300 ${activeTab === 'login' ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'text-gray-400 hover:text-white'}`}
                         >
                             Login
                         </button>
@@ -189,144 +209,137 @@ const LoginPage = ({initialTab = 'login', onLogin}) => {
                                 setActiveTab('signup');
                                 setError('');
                             }}
-                            className={`flex-1 py-2 px-4 rounded-md transition-all duration-300 ${activeTab === 'signup'
-                                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                : 'text-gray-400 hover:text-white'
-                            }`}
+                            className={`flex-1 py-2 px-4 rounded-md transition-all duration-300 ${activeTab === 'signup' ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'text-gray-400 hover:text-white'}`}
                         >
                             Sign Up
                         </button>
                     </div>
 
-                    {error && (
-                        <div
-                            className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg flex items-center gap-2 text-red-200">
-                            <AlertCircle size={20}/>
-                            <span>{error}</span>
-                        </div>
-                    )}
+                    {error && (<div
+                        className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg flex items-center gap-2 text-red-200">
+                        <AlertCircle size={20}/>
+                        <span>{error}</span>
+                    </div>)}
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        {activeTab === 'login' ? (
-                            <>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleInputChange}
-                                        placeholder="Email"
-                                        required
-                                        className="w-full bg-gray-800/50 text-white placeholder-gray-400 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
-                                    />
-                                </div>
+                        {activeTab === 'login' ? (<>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    placeholder="Email"
+                                    required
+                                    className="w-full bg-gray-800/50 text-white placeholder-gray-400 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
+                                />
+                            </div>
 
-                                <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        name="password"
-                                        value={formData.password}
-                                        onChange={handleInputChange}
-                                        placeholder="Password"
-                                        required
-                                        className="w-full bg-gray-800/50 text-white placeholder-gray-400 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                                    >
-                                        {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
-                                    </button>
-                                </div>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    placeholder="Password"
+                                    required
+                                    className="w-full bg-gray-800/50 text-white placeholder-gray-400 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                                >
+                                    {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+                                </button>
+                            </div>
 
-                                <div className="flex justify-between items-center text-sm">
-                                    <label className="flex items-center text-gray-400 hover:text-white cursor-pointer">
-                                        <input type="checkbox" className="mr-2 rounded border-gray-600"/>
-                                        Remember me
-                                    </label>
-                                    <button
-                                        type="button"
-                                        onClick={() => navigate('/forgot-password')}
-                                        className="text-blue-400 hover:text-blue-300"
-                                    >
-                                        Forgot password?
-                                    </button>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
-                                    <input
-                                        type="text"
-                                        name="username"
-                                        value={formData.username}
-                                        onChange={handleInputChange}
-                                        placeholder="Username"
-                                        required
-                                        className="w-full bg-gray-800/50 text-white placeholder-gray-400 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
-                                    />
-                                </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <label className="flex items-center text-gray-400 hover:text-white cursor-pointer">
+                                    <input id="remember-me"
+                                           type="checkbox"
+                                           checked={rememberMe}
+                                           onChange={(event) => {
+                                               setRememberMe(event.target.checked);
+                                           }}
+                                           className="mr-2 rounded border-gray-600"/>
+                                    Remember me
+                                </label>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/forgot-password')}
+                                    className="text-blue-400 hover:text-blue-300"
+                                >
+                                    Forgot password?
+                                </button>
+                            </div>
+                        </>) : (<>
+                            <div className="relative">
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
+                                <input
+                                    type="text"
+                                    name="username"
+                                    value={formData.username}
+                                    onChange={handleInputChange}
+                                    placeholder="Username"
+                                    required
+                                    className="w-full bg-gray-800/50 text-white placeholder-gray-400 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
+                                />
+                            </div>
 
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleInputChange}
-                                        placeholder="Email"
-                                        required
-                                        className="w-full bg-gray-800/50 text-white placeholder-gray-400 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
-                                    />
-                                </div>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    placeholder="Email"
+                                    required
+                                    className="w-full bg-gray-800/50 text-white placeholder-gray-400 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
+                                />
+                            </div>
 
-                                <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        name="password"
-                                        value={formData.password}
-                                        onChange={handleInputChange}
-                                        placeholder="Password"
-                                        required
-                                        className="w-full bg-gray-800/50 text-white placeholder-gray-400 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                                    >
-                                        {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
-                                    </button>
-                                </div>
-                            </>
-                        )}
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20}/>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    placeholder="Password"
+                                    required
+                                    className="w-full bg-gray-800/50 text-white placeholder-gray-400 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-700/50"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                                >
+                                    {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+                                </button>
+                            </div>
+                        </>)}
 
                         <button
                             type="submit"
                             disabled={isLoading}
                             className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-lg py-3 px-4 transition-all duration-300 flex items-center justify-center gap-2 group ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
-                            {isLoading ? (
-                                <span>Loading...</span>
-                            ) : (
-                                <>
-                                    {activeTab === 'login' ? 'Login' : 'Create Account'}
-                                    <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20}/>
-                                </>
-                            )}
+                            {isLoading ? (<span>Loading...</span>) : (<>
+                                {activeTab === 'login' ? 'Login' : 'Create Account'}
+                                <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20}/>
+                            </>)}
                         </button>
 
 
                     </form>
                 </div>
             </div>
-        </div>
-    );
-};
+        </div>);
+}
+
 
 export default LoginPage;

@@ -18,19 +18,23 @@ import {useNavigate} from 'react-router-dom';
 import {format} from 'date-fns';
 
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const client = axios.create({
     baseURL: "http://127.0.0.1:5000",
 });
 
-const HistoryPage = ({userName, onLogout}) => {
+const HistoryPage = ({}) => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = React.useState('');
     const [filteredHistory, setFilteredHistory] = React.useState([]);
     const [historyData, setHistoryData] = React.useState([]);
 
     React.useEffect(() => {
-        client.get("/api/history")
+        const username_hash = Cookies.get("auth_token");
+        client.post("/api/history", {
+            username_hash: username_hash
+        }, { withCredentials: true })
             .then((response) => {
                 console.log(response.data);
                 setHistoryData(response.data);

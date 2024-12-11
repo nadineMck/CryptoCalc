@@ -29,6 +29,7 @@ import {useNavigate} from 'react-router-dom';
 
 
 import axios from "axios";
+import Cookies from "js-cookie";
 
 axios.defaults.withCredentials = true;
 
@@ -123,11 +124,13 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
         second: '',
         modulo: ''
     });
-    const handleDeleteUser = () => {
-        // Add your delete user logic here
+    const handleDeleteUser = async () => {
+        const username_hash = Cookies.get("auth_token");
         if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-            // Implement delete user functionality
-            handleLogoutClick(); // Logout after deletion
+            await client.post("/delete_user", {
+                username_hash: username_hash
+            }, {withCredentials: true});
+            handleLogoutClick();
         }
     };
     const [selectedField, setSelectedField] = React.useState('gf256');
@@ -257,17 +260,18 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
     };
 
     const handleCalculate = () => {
-        // send axios request, return result of calculation
+        const username_hash = Cookies.get("auth_token");
         client.post("/api/calculate", {
             polynomial1: first.value,
-            polynomial2: operation != 'inverse' ? second.value : "",
+            polynomial2: operation !== 'inverse' ? second.value : "",
             operation: operation,
             inputFormat: inputFormat,
             outputFormat: outputFormat,
             irreduciblePoly: irreduciblePoly,
             irreduciblePolyFormat: irreduciblePolyFormat,
             field: field,
-            timestamp: new Date()
+            timestamp: new Date(),
+            username_hash: username_hash
         })
             .then((response) => {
                 setCalculationSteps(response.data.steps);
@@ -280,7 +284,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
             .catch(function (error) {
                 setResult({
                     operation: operation,
-                    value: "An internal React Error has occured: " + error.toString(),
+                    value: "An internal React Error has occurred: " + error.toString(),
                     timestamp: new Date()
                 });
                 setCalculationSteps([{description: "Error", value: error.toString()}]);
@@ -515,7 +519,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                                         className="bg-gray-900/50 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-sm transition-all"
                                                                     >
 
-                                                                        {i == 0 ? "1" : "x"}{i > 1 ?
+                                                                        {i === 0 ? "1" : "x"}{i > 1 ?
                                                                         <sup>{i}</sup> : ''}
                                                                     </button>
                                                                 ))}
@@ -710,7 +714,7 @@ const AuthenticatedDashboard = ({onLogout, userName}) => {
                                                                 onClick={() => insertTerm(i)}
                                                                 className="bg-gray-900/50 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-sm transition-all"
                                                             >
-                                                                {i == 0 ? "1" : "x"}{i > 1 ? <sup>{i}</sup> : ''}
+                                                                {i === 0 ? "1" : "x"}{i > 1 ? <sup>{i}</sup> : ''}
                                                             </button>
                                                         ))}
                                                     </div>
